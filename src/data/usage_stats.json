@@ -11,6 +11,12 @@
         "generate_vue_component": 4,
         "test": 5
       }
+    },
+    "2025-06-03": {
+      "total_calls": 2,
+      "tool_breakdown": {
+        "test": 2
+      }
     }
   },
   "tool_usage": {
@@ -39,9 +45,9 @@
       ]
     },
     "test": {
-      "total_uses": 5,
+      "total_uses": 7,
       "first_used": "2025-06-02T23:00:37.545027",
-      "last_used": "2025-06-02T23:17:12.263216",
+      "last_used": "2025-06-03T01:31:17.767089",
       "feedback_scores": [],
       "contexts": []
     }
@@ -190,6 +196,22 @@
       "tool_name": "test",
       "timestamp": "2025-06-02T23:17:12.263216",
       "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "a300ea55-ba5f-4955-b6ef-f5e807e82f1b",
+      "tool_name": "test",
+      "timestamp": "2025-06-03T01:31:00.771979",
+      "date": "2025-06-03",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "e582fc43-0adf-4f13-b8c7-ab5ba1fe4681",
+      "tool_name": "test",
+      "timestamp": "2025-06-03T01:31:17.767089",
+      "date": "2025-06-03",
       "arguments": {},
       "user_id": "rabbitsbear"
     }
