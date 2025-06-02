@@ -1,0 +1,197 @@
+{
+  "metadata": {
+    "created_at": "2025-06-02T22:47:45.242715",
+    "version": "1.0.0"
+  },
+  "daily_stats": {
+    "2025-06-02": {
+      "total_calls": 13,
+      "tool_breakdown": {
+        "get_prompt_template": 4,
+        "generate_vue_component": 4,
+        "test": 5
+      }
+    }
+  },
+  "tool_usage": {
+    "get_prompt_template": {
+      "total_uses": 4,
+      "first_used": "2025-06-02T22:47:45.242844",
+      "last_used": "2025-06-02T22:54:09.406459",
+      "feedback_scores": [
+        5,
+        5
+      ],
+      "contexts": [
+        "提交代码场景"
+      ]
+    },
+    "generate_vue_component": {
+      "total_uses": 4,
+      "first_used": "2025-06-02T22:47:45.242971",
+      "last_used": "2025-06-02T22:54:09.406742",
+      "feedback_scores": [
+        4,
+        4
+      ],
+      "contexts": [
+        "生成确认对话框"
+      ]
+    },
+    "test": {
+      "total_uses": 5,
+      "first_used": "2025-06-02T23:00:37.545027",
+      "last_used": "2025-06-02T23:17:12.263216",
+      "feedback_scores": [],
+      "contexts": []
+    }
+  },
+  "user_feedback": [
+    {
+      "id": "49010772-e6a1-45d6-87fc-186e567d01fa",
+      "tool_name": "get_prompt_template",
+      "feedback": "excellent",
+      "context": "提交代码场景",
+      "timestamp": "2025-06-02T22:47:45.243172",
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "99a2e188-7ba0-4498-b516-679bcf6fee98",
+      "tool_name": "generate_vue_component",
+      "feedback": "good",
+      "context": "生成确认对话框",
+      "timestamp": "2025-06-02T22:47:45.243869",
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "d29f328e-b550-4910-8f52-8c92f1ea6dbc",
+      "tool_name": "get_prompt_template",
+      "feedback": "excellent",
+      "context": "提交代码场景",
+      "timestamp": "2025-06-02T22:54:09.405829",
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "b19b7ec1-f32c-478d-a78e-24b9d51135e2",
+      "tool_name": "generate_vue_component",
+      "feedback": "good",
+      "context": "生成确认对话框",
+      "timestamp": "2025-06-02T22:54:09.406965",
+      "user_id": "rabbitsbear"
+    }
+  ],
+  "usage_logs": [
+    {
+      "id": "464174e5-61cf-4452-a59f-353b9f6b80b1",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-02T22:47:45.242844",
+      "date": "2025-06-02",
+      "arguments": {
+        "prompt_type": "git_commit"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "4d6339a1-c542-4b79-abec-e796b295b90b",
+      "tool_name": "generate_vue_component",
+      "timestamp": "2025-06-02T22:47:45.242971",
+      "date": "2025-06-02",
+      "arguments": {
+        "component_type": "form"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "a39c9605-b1e6-404d-a425-e7cfa29ea741",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-02T22:47:45.243594",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "bb670c13-ea39-4f32-ba80-223dc66df1bc",
+      "tool_name": "generate_vue_component",
+      "timestamp": "2025-06-02T22:47:45.243741",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "655c3aea-dcca-4b4c-bdb2-a8dc3ce3469c",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-02T22:54:09.405373",
+      "date": "2025-06-02",
+      "arguments": {
+        "prompt_type": "git_commit"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "57e65996-0c9f-4ec6-846e-0579ba49be77",
+      "tool_name": "generate_vue_component",
+      "timestamp": "2025-06-02T22:54:09.405638",
+      "date": "2025-06-02",
+      "arguments": {
+        "component_type": "form"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "b7b0d5eb-f3c2-4ff6-9c56-975f96bf8fac",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-02T22:54:09.406459",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "1b2d96dd-0e8c-4c62-9e6b-3720b598341a",
+      "tool_name": "generate_vue_component",
+      "timestamp": "2025-06-02T22:54:09.406742",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "9f8ba6eb-e913-46eb-b437-a6acdb54b172",
+      "tool_name": "test",
+      "timestamp": "2025-06-02T23:00:37.545027",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "21289d96-58db-4d5a-84f8-e16819114c29",
+      "tool_name": "test",
+      "timestamp": "2025-06-02T23:03:50.910316",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "1a78d8d7-0b98-4d3f-ad16-84d78ab330d3",
+      "tool_name": "test",
+      "timestamp": "2025-06-02T23:11:01.936347",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "53f2d1c5-f489-4fd4-8889-162ead75ad98",
+      "tool_name": "test",
+      "timestamp": "2025-06-02T23:13:12.035577",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "74bbaba0-4332-4419-acd1-94b257de9fd1",
+      "tool_name": "test",
+      "timestamp": "2025-06-02T23:17:12.263216",
+      "date": "2025-06-02",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    }
+  ]
+}

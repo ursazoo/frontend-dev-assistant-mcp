@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "frontend-dev-assistant": {
+      "command": "/Users/rabbitsbear/project/mine/python-mcp/venv/bin/python",
+      "args": ["/Users/rabbitsbear/project/mine/python-mcp/start_mcp.py"],
+      "env": {}
+    }
+  }
+}
