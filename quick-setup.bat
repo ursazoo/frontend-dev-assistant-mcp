@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 REM 前端开发提示词智能助手 MCP - Windows快速配置脚本
 
 echo 🚀 前端开发提示词智能助手 MCP 快速配置
@@ -34,11 +35,23 @@ if exist venv (
 REM 步骤3：安装依赖
 echo.
 echo 📌 步骤3: 安装依赖包...
-venv\Scripts\pip install -r requirements.txt >nul 2>&1
+REM 检查 requirements.txt 是否存在
+if not exist requirements.txt (
+    echo ❌ 缺少 requirements.txt，请确认目录完整
+    pause
+    exit /b 1
+)
+REM 检查 start_mcp.py 是否存在
+if not exist start_mcp.py (
+    echo ❌ 缺少 start_mcp.py，无法启动主服务
+    pause
+    exit /b 1
+)
+venv\Scripts\pip install -r requirements.txt >install.log 2>&1
 if %errorlevel% equ 0 (
     echo ✓ 依赖安装成功
 ) else (
-    echo ❌ 依赖安装失败
+    echo ❌ 依赖安装失败，详情见 install.log
     pause
     exit /b 1
 )
@@ -103,5 +116,10 @@ echo - 遇到问题运行: venv\Scripts\python test_server.py
 
 REM 清理临时文件
 if exist test_output.log del test_output.log
+
+REM 结束时增加一键启动主服务提示
+echo.
+echo 🚦 一键启动 MCP 主服务：
+echo venv\Scripts\python start_mcp.py
 
 pause 

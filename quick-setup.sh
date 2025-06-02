@@ -1,6 +1,8 @@
 #!/bin/bash
 # 前端开发提示词智能助手 MCP - 快速配置脚本
 
+set -e
+
 echo "🚀 前端开发提示词智能助手 MCP 快速配置"
 echo "========================================"
 
@@ -45,11 +47,21 @@ fi
 # 步骤3：安装依赖
 echo ""
 echo "📌 步骤3: 安装依赖包..."
-./venv/bin/pip install -r requirements.txt > /dev/null 2>&1
+# 检查 requirements.txt 是否存在
+if [ ! -f "requirements.txt" ]; then
+  echo -e "${RED}✗${NC} 缺少 requirements.txt，请确认目录完整"
+  exit 1
+fi
+# 检查 start_mcp.py 是否存在
+if [ ! -f "start_mcp.py" ]; then
+  echo -e "${RED}✗${NC} 缺少 start_mcp.py，无法启动主服务"
+  exit 1
+fi
+./venv/bin/pip install -r requirements.txt > install.log 2>&1
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓${NC} 依赖安装成功"
 else
-    echo -e "${RED}✗${NC} 依赖安装失败"
+    echo -e "${RED}✗${NC} 依赖安装失败，详情见 install.log"
     exit 1
 fi
 
@@ -117,3 +129,8 @@ echo "- 遇到问题运行: ./venv/bin/python test_server.py"
 
 # 清理临时文件
 rm -f test_output.log 
+
+# 结束时增加一键启动主服务提示
+echo ""
+echo "🚦 一键启动 MCP 主服务："
+echo "./venv/bin/python start_mcp.py" 
