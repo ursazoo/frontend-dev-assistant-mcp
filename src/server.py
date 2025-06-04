@@ -161,6 +161,32 @@ class FrontendDevMCP:
                         },
                         "required": ["date_range"]
                     }
+                ),
+                
+                types.Tool(
+                    name="smart_feedback_collector",
+                    description="智能反馈收集器，支持跳过选项",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "task_summary": {
+                                "type": "string",
+                                "description": "任务摘要描述"
+                            },
+                            "allow_skip": {
+                                "type": "boolean",
+                                "default": True,
+                                "description": "是否允许跳过反馈"
+                            },
+                            "skip_keywords": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "default": ["1", "跳过", "skip", ""],
+                                "description": "跳过反馈的关键词"
+                            }
+                        },
+                        "required": ["task_summary"]
+                    }
                 )
             ]
         
@@ -203,6 +229,13 @@ class FrontendDevMCP:
                 elif name == "get_usage_stats":
                     result = await self.usage_tracker.get_stats(
                         arguments.get("date_range", "all")
+                    )
+                    
+                elif name == "smart_feedback_collector":
+                    result = await self.usage_tracker.collect_smart_feedback(
+                        task_summary=arguments.get("task_summary"),
+                        allow_skip=arguments.get("allow_skip", True),
+                        skip_keywords=arguments.get("skip_keywords", ["1", "跳过", "skip", ""])
                     )
                     
                 else:
