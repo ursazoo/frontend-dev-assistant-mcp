@@ -17,6 +17,13 @@
       "tool_breakdown": {
         "test": 2
       }
+    },
+    "2025-06-04": {
+      "total_calls": 6,
+      "tool_breakdown": {
+        "test": 2,
+        "track_usage": 4
+      }
     }
   },
   "tool_usage": {
@@ -45,9 +52,16 @@
       ]
     },
     "test": {
-      "total_uses": 7,
+      "total_uses": 9,
       "first_used": "2025-06-02T23:00:37.545027",
-      "last_used": "2025-06-03T01:31:17.767089",
+      "last_used": "2025-06-04T10:54:39.887545",
+      "feedback_scores": [],
+      "contexts": []
+    },
+    "track_usage": {
+      "total_uses": 4,
+      "first_used": "2025-06-04T11:32:35.858264",
+      "last_used": "2025-06-04T11:46:59.079924",
       "feedback_scores": [],
       "contexts": []
     }
@@ -83,6 +97,38 @@
       "feedback": "good",
       "context": "生成确认对话框",
       "timestamp": "2025-06-02T22:54:09.406965",
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "bfe55835-93cd-4cf2-9ab1-c3b5ac6977fc",
+      "tool_name": "已绑定桌台列表功能增强",
+      "feedback": "good",
+      "context": "为已绑定桌台列表添加编辑和查看点餐码功能，参考集团码列表的设计模式",
+      "timestamp": "2025-06-04T11:32:35.852521",
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "20114563-2ec7-47ad-b6ea-708dc76f6ac2",
+      "tool_name": "桌台列表按钮优化和未绑定桌台编辑功能",
+      "feedback": "good",
+      "context": "优化操作按钮大小，为未绑定桌台添加编辑功能，改进绑码按钮样式",
+      "timestamp": "2025-06-04T11:38:09.519747",
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "bc7bae2c-4058-47e7-aa10-4ebab645ae27",
+      "tool_name": "桌台列表布局优化 - 操作按钮下移",
+      "feedback": "excellent",
+      "context": "将操作按钮从右侧移动到桌台名称下方，解决横向空间不足和按钮截断问题",
+      "timestamp": "2025-06-04T11:42:14.995196",
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "a20d2dbd-541e-4e0e-9abf-8efa10bae0f6",
+      "tool_name": "修复编辑桌台功能报错",
+      "feedback": "good",
+      "context": "修复编辑桌台时 setInputValue 方法不存在的报错，改为直接设置 actionSheet 的 num 属性",
+      "timestamp": "2025-06-04T11:46:59.078068",
       "user_id": "rabbitsbear"
     }
   ],
@@ -213,6 +259,70 @@
       "timestamp": "2025-06-03T01:31:17.767089",
       "date": "2025-06-03",
       "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "ece8ff81-2d86-4a52-b55e-29a843c7e713",
+      "tool_name": "test",
+      "timestamp": "2025-06-04T10:54:23.926925",
+      "date": "2025-06-04",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "5da2c41c-c7f8-4d13-973a-0f314ba341d2",
+      "tool_name": "test",
+      "timestamp": "2025-06-04T10:54:39.887545",
+      "date": "2025-06-04",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "b01d5620-5c81-45e5-9e06-9a49b8bccd52",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-04T11:32:35.858264",
+      "date": "2025-06-04",
+      "arguments": {
+        "tool_name": "已绑定桌台列表功能增强",
+        "usage_context": "为已绑定桌台列表添加编辑和查看点餐码功能，参考集团码列表的设计模式",
+        "user_feedback": "good"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "1ed2ed8f-0ddc-40ed-bf5b-36e2f38979d5",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-04T11:38:09.521537",
+      "date": "2025-06-04",
+      "arguments": {
+        "tool_name": "桌台列表按钮优化和未绑定桌台编辑功能",
+        "usage_context": "优化操作按钮大小，为未绑定桌台添加编辑功能，改进绑码按钮样式",
+        "user_feedback": "good"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "c234833f-f900-4692-86db-fcdce4e9eb61",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-04T11:42:14.997212",
+      "date": "2025-06-04",
+      "arguments": {
+        "tool_name": "桌台列表布局优化 - 操作按钮下移",
+        "usage_context": "将操作按钮从右侧移动到桌台名称下方，解决横向空间不足和按钮截断问题",
+        "user_feedback": "excellent"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "04584c27-ecac-47ca-8edc-46c5ea44658a",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-04T11:46:59.079924",
+      "date": "2025-06-04",
+      "arguments": {
+        "tool_name": "修复编辑桌台功能报错",
+        "usage_context": "修复编辑桌台时 setInputValue 方法不存在的报错，改为直接设置 actionSheet 的 num 属性",
+        "user_feedback": "good"
+      },
       "user_id": "rabbitsbear"
     }
   ]
