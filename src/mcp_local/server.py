@@ -6,9 +6,9 @@
 import logging
 from typing import Any, Dict, List
 from mcp.server.fastmcp import FastMCP
-from mcp_local.prompt_manager import PromptManager
-from mcp_local.component_generator import ComponentGenerator
-from mcp_local.usage_tracker import UsageTracker
+from .prompt_manager import PromptManager
+from .component_generator import ComponentGenerator
+from .usage_tracker import UsageTracker
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -22,12 +22,12 @@ component_generator = ComponentGenerator()
 usage_tracker = UsageTracker()
 
 @mcp.tool()
-def get_prompt_template(prompt_type: str, context: str = "") -> str:
+async def get_prompt_template(prompt_type: str, context: str = "") -> str:
     """获取指定类型的提示词模板"""
-    return prompt_manager.get_template(prompt_type, context)
+    return await prompt_manager.get_template(prompt_type, context)
 
 @mcp.tool()
-def generate_vue_component(
+async def generate_vue_component(
     component_type: str,
     component_name: str,
     vue_version: str,
@@ -35,7 +35,7 @@ def generate_vue_component(
     features: list = None
 ) -> str:
     """基于编码规范生成Vue组件"""
-    return component_generator.generate_component(
+    return await component_generator.generate_component(
         component_type=component_type,
         component_name=component_name,
         vue_version=vue_version,
@@ -44,26 +44,26 @@ def generate_vue_component(
     )
 
 @mcp.tool()
-def find_reusable_components(
+async def find_reusable_components(
     project_path: str,
     component_type: str = None,
     search_keywords: list = None
 ) -> str:
     """在项目中查找可复用的组件"""
-    return component_generator.find_reusable_components(
+    return await component_generator.find_reusable_components(
         project_path=project_path,
         component_type=component_type,
         search_keywords=search_keywords or []
     )
 
 @mcp.tool()
-def track_usage(
+async def track_usage(
     tool_name: str,
     user_feedback: str = None,
     usage_context: str = ""
 ) -> str:
     """记录MCP工具使用情况"""
-    return usage_tracker.track_usage(
+    return await usage_tracker.track_usage(
         tool_name=tool_name,
         user_feedback=user_feedback,
         usage_context=usage_context

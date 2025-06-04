@@ -229,9 +229,8 @@ async def main():
             InitializationOptions(
                 server_name="frontend-dev-assistant",
                 server_version="1.0.0",
-                capabilities=mcp_app.server.get_capabilities(
-                    notification_options=None,
-                    experimental_capabilities=None,
+                capabilities=types.ServerCapabilities(
+                    tools=types.ToolsCapability(listChanged=False)
                 )
             )
         )
