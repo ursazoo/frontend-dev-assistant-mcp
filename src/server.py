@@ -13,9 +13,9 @@ from mcp.server import Server
 from mcp.server.models import InitializationOptions
 import mcp.server.stdio
 import mcp.types as types
-from prompt_manager import PromptManager
-from component_generator import ComponentGenerator
-from usage_tracker import UsageTracker
+from mcp_local.prompt_manager import PromptManager
+from mcp_local.component_generator import ComponentGenerator
+from mcp_local.usage_tracker import UsageTracker
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
