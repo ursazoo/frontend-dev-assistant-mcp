@@ -24,6 +24,12 @@
         "test": 2,
         "track_usage": 4
       }
+    },
+    "2025-06-06": {
+      "total_calls": 1,
+      "tool_breakdown": {
+        "test": 1
+      }
     }
   },
   "tool_usage": {
@@ -52,9 +58,9 @@
       ]
     },
     "test": {
-      "total_uses": 9,
+      "total_uses": 10,
       "first_used": "2025-06-02T23:00:37.545027",
-      "last_used": "2025-06-04T10:54:39.887545",
+      "last_used": "2025-06-06T09:37:53.505389",
       "feedback_scores": [],
       "contexts": []
     },
@@ -323,6 +329,14 @@
         "usage_context": "修复编辑桌台时 setInputValue 方法不存在的报错，改为直接设置 actionSheet 的 num 属性",
         "user_feedback": "good"
       },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "295181dd-40ea-4edd-9913-4aac3ec26dcb",
+      "tool_name": "test",
+      "timestamp": "2025-06-06T09:37:53.505389",
+      "date": "2025-06-06",
+      "arguments": {},
       "user_id": "rabbitsbear"
     }
   ]
