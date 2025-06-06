@@ -7,8 +7,9 @@ import sys
 import os
 import asyncio
 
-# 添加src目录到Python路径
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+# 添加项目根目录到Python路径
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(project_root)
 
 from src.server import FrontendDevMCP
 
@@ -56,8 +57,8 @@ if __name__ == "__main__":
         print("\n🎉 服务器测试通过!")
         print("📋 MCP服务器可以正常工作")
         print("💡 要在Cursor中使用，需要正确配置MCP连接")
-        print("🔗 Cursor配置指南: 查看 cursor_config.md")
-        print("⚡ 快速使用: 查看 static_prompts.md")
+        print("🔗 Cursor配置指南: 查看 docs/cursor_config.md")
+        print("⚡ 快速使用: 查看 docs/static_prompts.md")
     else:
         print("\n💔 服务器测试失败")
         sys.exit(1) 

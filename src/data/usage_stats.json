@@ -26,9 +26,9 @@
       }
     },
     "2025-06-06": {
-      "total_calls": 1,
+      "total_calls": 2,
       "tool_breakdown": {
-        "test": 1
+        "test": 2
       }
     }
   },
@@ -58,9 +58,9 @@
       ]
     },
     "test": {
-      "total_uses": 10,
+      "total_uses": 11,
       "first_used": "2025-06-02T23:00:37.545027",
-      "last_used": "2025-06-06T09:37:53.505389",
+      "last_used": "2025-06-06T10:27:36.308745",
       "feedback_scores": [],
       "contexts": []
     },
@@ -335,6 +335,14 @@
       "id": "295181dd-40ea-4edd-9913-4aac3ec26dcb",
       "tool_name": "test",
       "timestamp": "2025-06-06T09:37:53.505389",
+      "date": "2025-06-06",
+      "arguments": {},
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "cf25b02e-5e7d-4678-bb45-b7ce61f873de",
+      "tool_name": "test",
+      "timestamp": "2025-06-06T10:27:36.308745",
       "date": "2025-06-06",
       "arguments": {},
       "user_id": "rabbitsbear"
