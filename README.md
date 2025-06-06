@@ -9,213 +9,78 @@
 3. **组件复用助手**：快速定位和复用项目中的现有组件
 4. **使用效果追踪**：记录AI工具使用情况和效果反馈
 
-## 🚀 快速开始（5分钟配置）
+## 🚀 快速开始 (推荐)
 
-### macOS/Linux用户
-
-```bash
-# 1. 运行快速配置脚本
-./scripts/quick-setup.sh
-
-# 2. 复制生成的配置到Cursor
-# 3. 重启Cursor即可使用
-```
-
-### Windows用户
-
-```batch
-# 1. 运行快速配置脚本
-scripts/quick-setup.bat
-
-# 2. 复制生成的配置到Cursor
-# 3. 重启Cursor即可使用
-```
-
-### 手动配置（如果脚本失败）
-
-查看详细的[MCP使用手册](docs/MCP使用手册.md)
-
-## 🎯 使用方式选择
-
-### 方式1：完整MCP服务（推荐团队使用）
-
-**优势**：功能完整、自动化程度高、包含使用统计
-**适用**：团队深度使用、需要数据统计
-
-#### 安装依赖
+### 1. 安装
 
 ```bash
-# 创建Python虚拟环境
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 安装依赖
-pip install -r requirements.txt
+# 从Git仓库直接安装
+pip install git+https://github.com/ursazoo/frontend-dev-assistant-mcp.git
 ```
-
-#### 启动MCP服务器
-
+如果遇到权限问题，可以尝试用户模式安装:
 ```bash
-python start_mcp.py
+pip install --user git+https://github.com/ursazoo/frontend-dev-assistant-mcp.git
 ```
 
-#### 在Cursor中配置
-
+### 2. 配置
+在你的项目根目录或全局`~/.cursor`目录下，创建`mcp.json`文件：
 ```json
 {
   "mcpServers": {
     "frontend-dev-assistant": {
-      "command": "/your/project/path/venv/bin/python",
-      "args": ["/your/project/path/start_mcp.py"]
+      "command": "frontend-dev-assistant"
     }
   }
 }
 ```
 
-### 方式2：静态提示词（快速开始）
+### 3. 使用
+重启Cursor后，即可在聊天中使用。例如：
+- `"请帮我获取git_commit提示词模板"`
+- `"帮我生成一个Vue3的用户表格组件"`
 
-**优势**：无需安装、即用即学、零依赖
-**适用**：个人使用、快速尝试、简单场景
-
-直接查看 `static_prompts.md` 文件，复制提示词到Cursor中使用。
-
-#### 常用提示词
-
-1. **Git代码提交助手** - 智能分批次提交代码
-2. **代码审查助手** - 基于团队规范审查代码  
-3. **Vue组件生成** - 生成标准化Vue组件
-4. **组件复用查找** - 快速定位项目中的可复用组件
-5. **API接口封装** - 标准化API接口开发
-6. **单元测试生成** - 自动生成测试代码
+### 4. 更新
+```bash
+# 获取最新版本
+pip install --upgrade git+https://github.com/ursazoo/frontend-dev-assistant-mcp.git
+```
 
 ## 📁 项目结构
+项目遵循标准的Python包布局。
+- `src/frontend_dev_assistant`: 核心源代码
+- `docs`: 详细文档
+- `scripts`: 辅助脚本
+- `tests`: 测试文件
 
-```
-frontend-dev-assistant-mcp/
-├── 📁 src/
-│   ├── frontend_dev_assistant/    # 主要包代码 ✅
-│   ├── components/                # 组件模块
-│   ├── data/                      # 数据文件
-│   └── templates/                 # 模板文件
-├── 📁 docs/                       # 📖 所有文档集中
-│   ├── 团队分发指南.md             # 分发说明
-│   ├── MCP使用手册.md             # 使用手册  
-│   ├── cursor_config.md           # 配置说明
-│   ├── browser_extension_guide.md # 浏览器方案
-│   └── static_prompts.md          # 静态提示词
-├── 📁 scripts/                    # 🔧 脚本工具集中
-│   ├── quick-setup.sh/bat         # 快速安装
-│   └── run_mcp*.sh                # MCP运行脚本
-├── 📁 tests/                      # 🧪 测试文件集中
-│   ├── test_server.py             # 服务器测试
-│   └── test_mcp.py                # MCP测试
-├── pyproject.toml                 # 包配置 ✅
-├── requirements.txt               # 依赖列表 ✅
-└── README.md                      # 项目说明 ✅
-```
-
-## 技术栈
-
-- Python 3.8+（仅完整MCP需要）
-- MCP (Model Context Protocol)
-- 支持 Vue2/Vue3、Taro、微信小程序
-
-## 快速体验（无需安装）
-
-1. 打开 `static_prompts.md` 文件
-2. 选择适合的提示词模板
-3. 复制到Cursor聊天窗口
-4. 根据提示填写具体参数
-5. 获得标准化的代码和建议
-
-## 完整功能测试
+## 🧪 功能测试
 
 ```bash
-# 激活虚拟环境
-source venv/bin/activate
-
-# 运行功能测试
-python test_server.py
+# 运行功能测试 (确保已安装依赖)
+python tests/test_server.py
 ```
 
-## 功能特性
+## ✨ 主要功能
 
 ### 提示词模板
-
 - **代码提交助手**：智能分批次提交代码
 - **Code Review**：基于团队规范进行代码审查
 - **组件复用**：快速定位和复用现有组件
 - **Vue组件生成**：基于编码规范生成标准组件
 
-### 组件生成器（仅完整MCP）
-
+### 组件生成器
 支持生成以下类型的Vue组件：
+- 表单、表格、弹窗、通用业务组件
 
-- 表单组件
-- 表格组件
-- 弹窗组件
-- 通用业务组件
-
-### 使用统计（仅完整MCP）
-
+### 使用统计
 - 工具使用频率统计
 - 团队成员活跃度分析
 - 使用效果反馈收集
-- CTO数据报表生成
 
-## 📊 方式对比
-
-| 功能特性 | 静态提示词 | 完整MCP |
-|----------|------------|---------|
-| 🚀 启动速度 | 即开即用 | 需要启动服务 |
-| 💾 安装要求 | 无需安装 | Python 3.8+ |
-| 🎯 使用便捷性 | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| 🔧 功能丰富性 | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| 📈 数据统计 | ❌ | ✅ |
-| 🤖 自动化程度 | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| 👥 团队协作 | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-
-## 📝 使用建议
-
-### 个人开发者
-
-→ 推荐使用**静态提示词**方式，简单快捷
-
-### 小团队（5人以下）
-
-→ 可以先用**静态提示词**试用，后续升级到完整MCP
-
-### 中大型团队（5人以上）
-
-→ 推荐使用**完整MCP**，便于统计和管理
-
-### CTO/技术负责人
-
-→ 必须使用**完整MCP**，需要数据支撑决策
-
-## 开发团队
-
-适用于使用Vue2/Vue3、Taro技术栈的前端开发团队。
-
-## 📚 文档导航
-
-- [MCP使用手册](docs/MCP使用手册.md) - 详细的配置和使用指南
-- [静态提示词库](docs/static_prompts.md) - 无需安装的提示词集合
-- [Cursor配置指南](docs/cursor_config.md) - Cursor配置详解
-- [浏览器插件方案](docs/browser_extension_guide.md) - 替代方案
-
-## 问题反馈
-
-如果遇到问题，请按以下顺序尝试：
-
-1. **快速诊断**: 运行 `./venv/bin/python tests/test_server.py`
-2. **依赖问题**: 确保使用Python 3.8+和虚拟环境
-3. **配置问题**: 查看 [MCP使用手册](docs/MCP使用手册.md)
-4. **快速替代**: 使用 [静态提示词](docs/static_prompts.md)
+## 📚 详细文档
+更详细的说明、配置和使用示例，请查看`docs`目录下的相关文档：
+- **[团队分发指南.md](docs/团队分发指南.md)**: 如何将此工具分发给团队。
+- **[MCP使用手册.md](docs/MCP使用手册.md)**: MCP协议和工具的详细用法。
 
 ## 📞 技术支持
-
-- **Python别名问题**: 使用完整路径 `./venv/bin/python`
-- **配置路径问题**: 使用绝对路径，运行 `pwd` 获取
-- **功能验证**: 运行 `tests/test_server.py` 验证组件
-- **详细文档**: 查看 [MCP使用手册](docs/MCP使用手册.md)
+- **命令找不到?**: 确认pip安装路径在系统PATH中，或使用`python -m frontend_dev_assistant`。
+- **其他问题**: 请在项目的GitHub Issues中提出。
