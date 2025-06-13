@@ -9,15 +9,78 @@ from pathlib import Path
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 import uuid
+import asyncio
 
 class UsageTracker:
     def __init__(self):
-        # 统一数据目录为 src/data
-        project_root = Path(__file__).parent.parent
-        self.data_dir = project_root / "data"
+        # 智能确定数据目录位置
+        self.data_dir = self._determine_data_directory()
         self.data_dir.mkdir(exist_ok=True)
         self.usage_file = self.data_dir / "usage_stats.json"
         self.init_usage_file()
+        
+        # 初始化云端追踪器
+        self.cloud_tracker = None
+        self._init_cloud_tracker()
+    
+    def _determine_data_directory(self) -> Path:
+        """智能确定数据保存目录"""
+        # 优先级：
+        # 1. 环境变量指定的目录
+        # 2. 用户主目录下的 .frontend-dev-assistant
+        # 3. 当前工作目录下的 data 目录（开发模式）
+        # 4. 包安装目录下的 data 目录
+        
+        # 1. 检查环境变量
+        env_data_dir = os.environ.get('FRONTEND_DEV_ASSISTANT_DATA_DIR')
+        if env_data_dir:
+            data_path = Path(env_data_dir)
+            print(f"使用环境变量指定的数据目录: {data_path}")
+            return data_path
+        
+        # 2. 用户主目录（推荐用于pip安装）
+        home_data_dir = Path.home() / ".frontend-dev-assistant"
+        
+        # 3. 开发模式：检查是否在项目根目录
+        current_file_path = Path(__file__).parent.parent
+        project_data_dir = current_file_path / "data"
+        
+        # 如果存在项目的data目录且有数据，优先使用（开发模式）
+        if project_data_dir.exists() and (project_data_dir / "usage_stats.json").exists():
+            print(f"使用项目开发模式数据目录: {project_data_dir}")
+            return project_data_dir
+        
+        # 4. 检查是否通过pip安装（site-packages中）
+        if "site-packages" in str(Path(__file__)):
+            print(f"检测到pip安装模式，使用用户主目录: {home_data_dir}")
+            return home_data_dir
+        
+        # 5. 默认使用项目data目录（开发模式）
+        print(f"使用默认项目数据目录: {project_data_dir}")
+        return project_data_dir
+    
+    def _init_cloud_tracker(self):
+        """初始化云端追踪器"""
+        try:
+            from .cloud_usage_tracker import CloudUsageTracker
+            self.cloud_tracker = CloudUsageTracker()
+            
+            # 异步初始化云端连接
+            asyncio.create_task(self._async_init_cloud_tracker())
+        except ImportError:
+            print("⚠️  云端追踪模块未找到，仅使用本地模式")
+            self.cloud_tracker = None
+        except Exception as e:
+            print(f"⚠️  云端追踪器初始化失败: {e}")
+            self.cloud_tracker = None
+    
+    async def _async_init_cloud_tracker(self):
+        """异步初始化云端追踪器"""
+        if self.cloud_tracker:
+            try:
+                await self.cloud_tracker.register_user()
+            except Exception as e:
+                print(f"⚠️  云端用户注册失败: {e}")
     
     def init_usage_file(self):
         """初始化使用统计文件"""
@@ -88,8 +151,21 @@ class UsageTracker:
             # 保存数据
             self._save_usage_data(data)
             
+            # 异步上报到云端
+            if self.cloud_tracker:
+                asyncio.create_task(self._async_log_to_cloud(tool_name, arguments))
+            
         except Exception as e:
             print(f"记录工具调用失败: {str(e)}")
+    
+    async def _async_log_to_cloud(self, tool_name: str, arguments: Optional[Dict] = None):
+        """异步上报到云端"""
+        try:
+            if self.cloud_tracker:
+                await self.cloud_tracker.log_usage(tool_name, arguments)
+        except Exception:
+            # 静默失败，不影响本地使用
+            pass
     
     async def track_usage(
         self, 
