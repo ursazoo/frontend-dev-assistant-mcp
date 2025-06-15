@@ -171,14 +171,103 @@ class UsageTracker:
         self, 
         tool_name: str, 
         user_feedback: Optional[str] = None, 
-        usage_context: str = ""
+        usage_context: str = "",
+        # 新增AI编程效果相关参数
+        ai_session_data: Optional[Dict] = None,
+        coding_metrics: Optional[Dict] = None,
+        quality_metrics: Optional[Dict] = None
     ) -> str:
-        """记录使用反馈"""
+        """记录AI编程使用情况和效果数据"""
         try:
             data = self._load_usage_data()
             timestamp = datetime.now().isoformat()
+            today = datetime.now().strftime('%Y-%m-%d')
             
-            # 添加反馈记录
+            # 生成使用记录ID
+            usage_id = str(uuid.uuid4())
+            
+            # 构建增强的使用记录
+            enhanced_usage_entry = {
+                "id": usage_id,
+                "tool_name": tool_name,
+                "timestamp": timestamp,
+                "date": today,
+                "user_id": self._get_user_id(),
+                "context": usage_context,
+                "user_feedback": user_feedback,
+                
+                # AI编程效果数据
+                "ai_metrics": {
+                    "session_duration": ai_session_data.get('duration_minutes', 0) if ai_session_data else 0,
+                    "files_modified": ai_session_data.get('files_modified', 0) if ai_session_data else 0,
+                    "lines_generated": coding_metrics.get('lines_added', 0) if coding_metrics else 0,
+                    "lines_deleted": coding_metrics.get('lines_deleted', 0) if coding_metrics else 0,
+                    "complexity_added": coding_metrics.get('complexity_score', 0) if coding_metrics else 0,
+                    "ai_probability": coding_metrics.get('ai_probability', 0) if coding_metrics else 0,
+                    
+                    # 代码质量指标
+                    "quality_score": quality_metrics.get('quality_score', 0) if quality_metrics else 0,
+                    "has_comments": quality_metrics.get('has_comments', False) if quality_metrics else False,
+                    "has_error_handling": quality_metrics.get('has_error_handling', False) if quality_metrics else False,
+                    "has_type_annotations": quality_metrics.get('has_type_annotations', False) if quality_metrics else False,
+                    "function_count": quality_metrics.get('function_count', 0) if quality_metrics else 0,
+                    
+                    # 效率指标
+                    "productivity_score": self._calculate_productivity_score(coding_metrics, ai_session_data),
+                    "efficiency_rating": self._calculate_efficiency_rating(coding_metrics, quality_metrics)
+                }
+            }
+            
+            # 添加到增强使用日志
+            if "enhanced_usage_logs" not in data:
+                data["enhanced_usage_logs"] = []
+            data["enhanced_usage_logs"].append(enhanced_usage_entry)
+            
+            # 更新每日AI编程统计
+            if "daily_ai_stats" not in data:
+                data["daily_ai_stats"] = {}
+            
+            if today not in data["daily_ai_stats"]:
+                data["daily_ai_stats"][today] = {
+                    "total_sessions": 0,
+                    "total_lines_generated": 0,
+                    "total_files_modified": 0,
+                    "avg_ai_probability": 0,
+                    "avg_quality_score": 0,
+                    "avg_productivity": 0,
+                    "tool_breakdown": {}
+                }
+            
+            # 更新当日统计
+            daily_stats = data["daily_ai_stats"][today]
+            daily_stats["total_sessions"] += 1
+            daily_stats["total_lines_generated"] += enhanced_usage_entry["ai_metrics"]["lines_generated"]
+            daily_stats["total_files_modified"] += enhanced_usage_entry["ai_metrics"]["files_modified"]
+            
+            # 计算平均值
+            current_sessions = daily_stats["total_sessions"]
+            daily_stats["avg_ai_probability"] = self._update_average(
+                daily_stats["avg_ai_probability"], 
+                enhanced_usage_entry["ai_metrics"]["ai_probability"], 
+                current_sessions
+            )
+            daily_stats["avg_quality_score"] = self._update_average(
+                daily_stats["avg_quality_score"], 
+                enhanced_usage_entry["ai_metrics"]["quality_score"], 
+                current_sessions
+            )
+            daily_stats["avg_productivity"] = self._update_average(
+                daily_stats["avg_productivity"], 
+                enhanced_usage_entry["ai_metrics"]["productivity_score"], 
+                current_sessions
+            )
+            
+            # 工具分解统计
+            if tool_name not in daily_stats["tool_breakdown"]:
+                daily_stats["tool_breakdown"][tool_name] = 0
+            daily_stats["tool_breakdown"][tool_name] += 1
+            
+            # 添加传统反馈记录（保持兼容性）
             if user_feedback:
                 feedback_entry = {
                     "id": str(uuid.uuid4()),
@@ -186,7 +275,8 @@ class UsageTracker:
                     "feedback": user_feedback,
                     "context": usage_context,
                     "timestamp": timestamp,
-                    "user_id": self._get_user_id()
+                    "user_id": self._get_user_id(),
+                    "enhanced_usage_id": usage_id  # 关联到增强记录
                 }
                 
                 data["user_feedback"].append(feedback_entry)
@@ -217,18 +307,42 @@ class UsageTracker:
             return f"记录使用反馈时出错：{str(e)}"
     
     async def get_stats(self, date_range: str = "all") -> str:
-        """获取使用统计数据"""
+        """获取AI编程效果统计数据"""
         try:
             data = self._load_usage_data()
             
-            # 根据时间范围过滤数据
-            filtered_logs = self._filter_logs_by_date(data["usage_logs"], date_range)
-            filtered_daily_stats = self._filter_daily_stats_by_date(data["daily_stats"], date_range)
+            # 获取增强的AI编程数据
+            enhanced_logs = data.get("enhanced_usage_logs", [])
+            ai_daily_stats = data.get("daily_ai_stats", {})
             
-            # 生成统计报告
-            report = self._generate_stats_report(data, filtered_logs, filtered_daily_stats, date_range)
+            # 过滤AI编程数据
+            filtered_enhanced_logs = self._filter_logs_by_date(enhanced_logs, date_range)
+            filtered_ai_stats = self._filter_daily_stats_by_date(ai_daily_stats, date_range)
             
-            return report
+            # 生成AI编程效果报告
+            ai_report = self._generate_ai_programming_report(filtered_enhanced_logs, filtered_ai_stats, date_range)
+            
+            # 生成传统统计报告（保持兼容性）
+            filtered_logs = self._filter_logs_by_date(data.get("usage_logs", []), date_range)
+            filtered_daily_stats = self._filter_daily_stats_by_date(data.get("daily_stats", {}), date_range)
+            traditional_report = self._generate_stats_report(data, filtered_logs, filtered_daily_stats, date_range)
+            
+            # 合并报告
+            if enhanced_logs:  # 如果有AI编程数据，优先显示
+                combined_report = f"""
+🤖 AI编程效果分析报告 ({date_range})
+{'='*60}
+
+{ai_report}
+
+📊 工具使用基础统计
+{'='*30}
+{traditional_report}
+"""
+            else:
+                combined_report = traditional_report
+            
+            return combined_report
             
         except Exception as e:
             return f"获取统计数据时出错：{str(e)}"
@@ -629,3 +743,175 @@ class UsageTracker:
                 "message": f"处理反馈响应时出错：{str(e)}",
                 "recorded": False
             } 
+    
+    # 新增的AI编程效果分析方法
+    def _calculate_productivity_score(self, coding_metrics: Optional[Dict], ai_session_data: Optional[Dict]) -> float:
+        """计算生产力分数"""
+        if not coding_metrics and not ai_session_data:
+            return 0.0
+            
+        score = 0.0
+        
+        # 基于代码行数的生产力
+        lines_added = coding_metrics.get('lines_added', 0) if coding_metrics else 0
+        if lines_added > 0:
+            score += min(lines_added / 50, 1.0) * 0.4  # 最多40分
+        
+        # 基于会话时间的效率
+        session_duration = ai_session_data.get('duration_minutes', 0) if ai_session_data else 0
+        if session_duration > 0 and lines_added > 0:
+            lines_per_minute = lines_added / session_duration
+            score += min(lines_per_minute / 2, 1.0) * 0.3  # 最多30分
+        
+        # 基于文件数量的并行处理能力
+        files_modified = ai_session_data.get('files_modified', 0) if ai_session_data else 0
+        if files_modified > 1:
+            score += min(files_modified / 5, 1.0) * 0.3  # 最多30分
+        
+        return round(score, 2)
+    
+    def _calculate_efficiency_rating(self, coding_metrics: Optional[Dict], quality_metrics: Optional[Dict]) -> str:
+        """计算效率评级"""
+        if not coding_metrics and not quality_metrics:
+            return "未知"
+            
+        efficiency_score = 0
+        
+        # 代码质量影响效率
+        quality_score = quality_metrics.get('quality_score', 0) if quality_metrics else 0
+        efficiency_score += quality_score * 0.4
+        
+        # AI概率影响效率（适度使用AI更高效）
+        ai_probability = coding_metrics.get('ai_probability', 0) if coding_metrics else 0
+        if 0.3 <= ai_probability <= 0.8:  # 适度使用AI
+            efficiency_score += 30
+        elif ai_probability > 0.8:  # 过度依赖AI
+            efficiency_score += 15
+        else:  # 很少使用AI
+            efficiency_score += 10
+        
+        # 复杂度控制
+        complexity = coding_metrics.get('complexity_score', 0) if coding_metrics else 0
+        if complexity < 10:
+            efficiency_score += 20
+        elif complexity < 20:
+            efficiency_score += 10
+        
+        # 评级
+        if efficiency_score >= 80:
+            return "优秀"
+        elif efficiency_score >= 60:
+            return "良好"
+        elif efficiency_score >= 40:
+            return "一般"
+        else:
+            return "需改进"
+    
+    def _update_average(self, current_avg: float, new_value: float, count: int) -> float:
+        """更新平均值"""
+        if count <= 1:
+            return new_value
+        return round((current_avg * (count - 1) + new_value) / count, 3)
+    
+    def _generate_ai_programming_report(self, enhanced_logs: List[Dict], ai_stats: Dict, date_range: str) -> str:
+        """生成AI编程效果报告"""
+        if not enhanced_logs:
+            return "📭 暂无AI编程数据"
+        
+        # 基础统计
+        total_sessions = len(enhanced_logs)
+        total_lines = sum(log['ai_metrics']['lines_generated'] for log in enhanced_logs)
+        total_files = sum(log['ai_metrics']['files_modified'] for log in enhanced_logs)
+        
+        # 平均指标
+        avg_ai_probability = sum(log['ai_metrics']['ai_probability'] for log in enhanced_logs) / total_sessions
+        avg_quality_score = sum(log['ai_metrics']['quality_score'] for log in enhanced_logs) / total_sessions
+        avg_productivity = sum(log['ai_metrics']['productivity_score'] for log in enhanced_logs) / total_sessions
+        
+        # 效率分布
+        efficiency_ratings = [log['ai_metrics']['efficiency_rating'] for log in enhanced_logs]
+        rating_counts = {}
+        for rating in efficiency_ratings:
+            rating_counts[rating] = rating_counts.get(rating, 0) + 1
+        
+        # 代码质量分析
+        quality_indicators = {
+            'with_comments': sum(1 for log in enhanced_logs if log['ai_metrics']['has_comments']),
+            'with_error_handling': sum(1 for log in enhanced_logs if log['ai_metrics']['has_error_handling']),
+            'with_type_annotations': sum(1 for log in enhanced_logs if log['ai_metrics']['has_type_annotations'])
+        }
+        
+        # 工具使用分布
+        tool_usage = {}
+        for log in enhanced_logs:
+            tool = log['tool_name']
+            tool_usage[tool] = tool_usage.get(tool, 0) + 1
+        
+        # 生成报告
+        report = f"""
+📈 基础指标
+  • 编程会话总数：{total_sessions} 次
+  • 代码行数生成：{total_lines} 行
+  • 文件修改总数：{total_files} 个
+  • 平均会话时长：{sum(log['ai_metrics']['session_duration'] for log in enhanced_logs) / total_sessions:.1f} 分钟
+
+🎯 AI使用效果
+  • AI辅助概率：{avg_ai_probability:.1%}
+  • 代码质量分数：{avg_quality_score:.1f}/100
+  • 生产力评分：{avg_productivity:.2f}/1.0
+
+💡 代码质量分析
+  • 包含注释：{quality_indicators['with_comments']}/{total_sessions} ({quality_indicators['with_comments']/total_sessions:.1%})
+  • 错误处理：{quality_indicators['with_error_handling']}/{total_sessions} ({quality_indicators['with_error_handling']/total_sessions:.1%})
+  • 类型注解：{quality_indicators['with_type_annotations']}/{total_sessions} ({quality_indicators['with_type_annotations']/total_sessions:.1%})
+
+⚡ 效率评级分布
+"""
+        
+        for rating, count in rating_counts.items():
+            percentage = count / total_sessions
+            report += f"  • {rating}：{count} 次 ({percentage:.1%})\n"
+        
+        report += f"""
+🛠️ 工具使用分布
+"""
+        
+        for tool, count in sorted(tool_usage.items(), key=lambda x: x[1], reverse=True):
+            percentage = count / total_sessions
+            report += f"  • {tool}：{count} 次 ({percentage:.1%})\n"
+        
+        # 添加改进建议
+        suggestions = self._generate_ai_programming_suggestions(enhanced_logs, avg_quality_score, avg_ai_probability)
+        if suggestions:
+            report += f"""
+💡 改进建议
+{suggestions}
+"""
+        
+        return report
+    
+    def _generate_ai_programming_suggestions(self, enhanced_logs: List[Dict], avg_quality: float, avg_ai_prob: float) -> str:
+        """生成AI编程改进建议"""
+        suggestions = []
+        
+        # 代码质量建议
+        if avg_quality < 60:
+            suggestions.append("  • 建议增加代码注释和错误处理，提高代码质量")
+        
+        # AI使用建议
+        if avg_ai_prob > 0.8:
+            suggestions.append("  • AI依赖度较高，建议适当增加手工编码练习")
+        elif avg_ai_prob < 0.3:
+            suggestions.append("  • AI使用率较低，可以尝试更多AI辅助功能")
+        
+        # 效率建议
+        low_productivity_sessions = [log for log in enhanced_logs if log['ai_metrics']['productivity_score'] < 0.3]
+        if len(low_productivity_sessions) > len(enhanced_logs) * 0.3:
+            suggestions.append("  • 部分会话生产力较低，建议优化开发流程")
+        
+        # 复杂度建议
+        high_complexity_sessions = [log for log in enhanced_logs if log['ai_metrics']['complexity_added'] > 20]
+        if high_complexity_sessions:
+            suggestions.append("  • 注意控制代码复杂度，考虑重构复杂的代码块")
+        
+        return "\n".join(suggestions) if suggestions else "  • 当前开发效果良好，继续保持！" 

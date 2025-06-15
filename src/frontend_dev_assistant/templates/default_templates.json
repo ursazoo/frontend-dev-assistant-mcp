@@ -3,8 +3,8 @@
     "name": "Git 代码提交助手",
     "description": "帮助开发者分批次、规范化提交代码",
     "template": "帮我分批次提交代码。请先检查 git status，然后分析所有未暂存的修改，并一次性提供一个完整的、按模块或功能分组的提交计划。\n\n计划应包含：\n1. 每个批次要提交的文件列表\n2. 为每个批次建议的 commit message (格式为 feat/fix: 中文描述)\n\n请等待我确认或修改计划后再执行任何 git 命令。\n\n注意事项：\n- 遵循 Conventional Commits 规范\n- commit message 使用中文描述\n- 按功能模块合理分组\n- 避免混合不相关的改动\n\n{context}",
-    "usage_count": 4,
-    "last_used": "2025-06-06T10:27:36.307953",
+    "usage_count": 8,
+    "last_used": "2025-06-16T01:51:36.956194",
     "tags": [
       "git",
       "提交",
@@ -27,8 +27,8 @@
     "name": "组件复用助手",
     "description": "帮助快速定位和复用项目中的现有组件",
     "template": "帮我复用项目中的{component_type}组件。\n\n请执行以下步骤：\n\n1. **查找现有组件**：\n   - 在项目的 components 目录下查找相关组件\n   - 分析组件的 props 接口和使用方式\n   - 确定组件的适用场景\n\n2. **生成使用代码**：\n   - 提供完整的引入语句\n   - 展示基本使用示例\n   - 说明主要 props 的作用和类型\n\n3. **定制建议**：\n   - 如果现有组件不完全匹配需求，提供修改建议\n   - 建议如何扩展组件功能\n   - 提醒注意事项和最佳实践\n\n搜索关键词：{keywords}\n\n期望功能：{expected_features}\n\n请在指定位置生成对应的代码，并确保：\n- 正确引入组件依赖\n- 使用符合团队规范的代码风格\n- 添加必要的注释说明\n\n{context}",
-    "usage_count": 0,
-    "last_used": null,
+    "usage_count": 1,
+    "last_used": "2025-06-16T01:41:17.263957",
     "tags": [
       "组件复用",
       "代码生成",

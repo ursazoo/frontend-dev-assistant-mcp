@@ -6,6 +6,7 @@
 import asyncio
 import json
 import logging
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -16,6 +17,7 @@ import mcp.types as types
 from frontend_dev_assistant.prompt_manager import PromptManager
 from frontend_dev_assistant.component_generator import ComponentGenerator
 from frontend_dev_assistant.usage_tracker import UsageTracker
+from frontend_dev_assistant.call_tracker import call_tracker
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -196,6 +198,12 @@ class FrontendDevMCP:
         ) -> list[types.TextContent]:
             """处理工具调用"""
             
+            # 记录调用开始时间
+            start_time = time.time()
+            success = True
+            error_message = None
+            result = None
+            
             try:
                 if name == "get_prompt_template":
                     result = await self.prompt_manager.get_template(
@@ -247,8 +255,24 @@ class FrontendDevMCP:
                 return [types.TextContent(type="text", text=str(result))]
                 
             except Exception as e:
+                success = False
+                error_message = str(e)
                 logger.error(f"工具调用错误 {name}: {str(e)}")
                 return [types.TextContent(type="text", text=f"错误: {str(e)}")]
+                
+            finally:
+                # 自动记录MCP调用
+                execution_time = time.time() - start_time
+                result_size = len(str(result).encode('utf-8')) if result else 0
+                
+                await call_tracker.record_call(
+                    tool_name=name,
+                    arguments=arguments,
+                    execution_time=execution_time,
+                    success=success,
+                    error_message=error_message,
+                    result_size=result_size
+                )
 
 async def main():
     """启动MCP服务器"""
