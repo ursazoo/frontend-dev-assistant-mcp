@@ -47,6 +47,53 @@ class DatabaseManager:
                 )
             ''')
             
+            # 创建Git会话表
+            await conn.execute('''
+                CREATE TABLE IF NOT EXISTS git_sessions (
+                    session_id VARCHAR(36) PRIMARY KEY,
+                    user_uuid VARCHAR(36) REFERENCES users(uuid),
+                    repository_url TEXT NOT NULL,
+                    repository_type VARCHAR(50) NOT NULL,
+                    branch_name VARCHAR(100),
+                    start_time TIMESTAMP NOT NULL,
+                    end_time TIMESTAMP,
+                    is_active BOOLEAN DEFAULT TRUE
+                )
+            ''')
+            
+            # 创建代码变更表
+            await conn.execute('''
+                CREATE TABLE IF NOT EXISTS code_changes (
+                    id SERIAL PRIMARY KEY,
+                    session_id VARCHAR(36) REFERENCES git_sessions(session_id),
+                    file_path TEXT NOT NULL,
+                    lines_added INTEGER DEFAULT 0,
+                    lines_deleted INTEGER DEFAULT 0,
+                    complexity_change INTEGER DEFAULT 0,
+                    functions_added INTEGER DEFAULT 0,
+                    has_type_annotations BOOLEAN DEFAULT FALSE,
+                    has_error_handling BOOLEAN DEFAULT FALSE,
+                    change_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+            
+            # 创建提交分析表
+            await conn.execute('''
+                CREATE TABLE IF NOT EXISTS commit_analysis (
+                    id SERIAL PRIMARY KEY,
+                    commit_hash VARCHAR(40) UNIQUE NOT NULL,
+                    session_id VARCHAR(36) REFERENCES git_sessions(session_id),
+                    author_name VARCHAR(255) NOT NULL,
+                    author_email VARCHAR(255) NOT NULL,
+                    commit_message TEXT NOT NULL,
+                    is_ai_assisted BOOLEAN DEFAULT FALSE,
+                    files_changed INTEGER DEFAULT 0,
+                    lines_added INTEGER DEFAULT 0,
+                    lines_deleted INTEGER DEFAULT 0,
+                    commit_date TIMESTAMP NOT NULL
+                )
+            ''')
+            
             # 创建索引
             await conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_usage_logs_user_uuid 
@@ -61,6 +108,21 @@ class DatabaseManager:
             await conn.execute('''
                 CREATE INDEX IF NOT EXISTS idx_usage_logs_tool_name 
                 ON usage_logs(tool_name)
+            ''')
+            
+            await conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_git_sessions_user_uuid 
+                ON git_sessions(user_uuid)
+            ''')
+            
+            await conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_code_changes_session_id 
+                ON code_changes(session_id)
+            ''')
+            
+            await conn.execute('''
+                CREATE INDEX IF NOT EXISTS idx_commit_analysis_session_id 
+                ON commit_analysis(session_id)
             ''')
             
             print("✅ 数据库表结构初始化完成")
