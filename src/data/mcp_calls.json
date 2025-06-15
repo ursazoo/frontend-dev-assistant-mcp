@@ -1,0 +1,440 @@
+{
+  "metadata": {
+    "created_at": "2025-06-13T17:10:17.141554",
+    "version": "1.0.0",
+    "tracker_type": "automatic_mcp_calls"
+  },
+  "calls": [
+    {
+      "id": "1749807036812_smart_feedback_collector",
+      "tool_name": "smart_feedback_collector",
+      "timestamp": "2025-06-13T17:30:36.812306",
+      "date": "2025-06-13",
+      "hour": 17,
+      "arguments": {
+        "task_summary": "开发分销规则页面，包含列表展示、搜索、新增、编辑、删除功能，使用Element Plus组件构建用户界面"
+      },
+      "execution_time_ms": 9.46,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 475,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1749887654560_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-14T15:54:14.555876",
+      "date": "2025-06-14",
+      "hour": 15,
+      "arguments": {
+        "tool_name": "登录页面迁移",
+        "usage_context": "将driver-coach-admin-element项目的登录页面迁移到element-plus-vite-starter项目，去除国际化和主题配置，保持核心功能",
+        "user_feedback": "excellent"
+      },
+      "execution_time_ms": 357.74,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 65,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1749892699044_smart_feedback_collector",
+      "tool_name": "smart_feedback_collector",
+      "timestamp": "2025-06-14T17:18:19.044423",
+      "date": "2025-06-14",
+      "hour": 17,
+      "arguments": {
+        "task_summary": "用户非常愤怒地指出我在分销商管理页面中的表格列定义都对不上，需要立即修复所有字段不匹配的问题"
+      },
+      "execution_time_ms": 20.86,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 481,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1749892747550_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-14T17:19:07.550061",
+      "date": "2025-06-14",
+      "hour": 17,
+      "arguments": {
+        "tool_name": "smart_feedback_collector",
+        "usage_context": "收集用户对表格字段定义错误修复任务的反馈",
+        "user_feedback": "poor"
+      },
+      "execution_time_ms": 5.12,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 66,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1749916115488_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-14T23:48:35.488048",
+      "date": "2025-06-14",
+      "hour": 23,
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "修复了pnpm run preview预览白屏问题，主要解决了路由无限重定向循环问题，修复了authStore.initUserInfo空实现和onRouteSwitchWhenNotLoggedIn方法逻辑错误"
+      },
+      "execution_time_ms": 14.84,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 893,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1749916161326_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-14T23:49:21.326537",
+      "date": "2025-06-14",
+      "hour": 23,
+      "arguments": {
+        "tool_name": "代码修复调试",
+        "usage_context": "修复 pnpm run preview 预览白屏问题，解决路由无限重定向循环，修复authStore.initUserInfo空实现和onRouteSwitchWhenNotLoggedIn方法逻辑错误",
+        "user_feedback": "excellent"
+      },
+      "execution_time_ms": 3.3,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 65,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1749961910285_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-15T12:31:50.285347",
+      "date": "2025-06-15",
+      "hour": 12,
+      "arguments": {
+        "tool_name": "环境变量配置修复",
+        "usage_context": "修复生产环境接口调用错误，调整成功码配置格式",
+        "user_feedback": "excellent"
+      },
+      "execution_time_ms": 9.77,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 71,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750009177167_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:39:37.167001",
+      "date": "2025-06-16",
+      "hour": 1,
+      "arguments": {
+        "prompt_type": "git_commit"
+      },
+      "execution_time_ms": 8.52,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 687,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750009237159_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:40:37.159551",
+      "date": "2025-06-16",
+      "hour": 1,
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "前端项目代码提交"
+      },
+      "execution_time_ms": 5.59,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 731,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750009277266_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:41:17.266836",
+      "date": "2025-06-16",
+      "hour": 1,
+      "arguments": {
+        "prompt_type": "component_reuse",
+        "context": "用户需要生成组件的提示词"
+      },
+      "execution_time_ms": 3.36,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 992,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750009283706_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T01:41:23.705987",
+      "date": "2025-06-16",
+      "hour": 1,
+      "arguments": {
+        "tool_name": "get_prompt_template",
+        "usage_context": "用户获取组件复用提示词模板",
+        "user_feedback": "good"
+      },
+      "execution_time_ms": 3.98,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 61,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750009896963_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:51:36.963975",
+      "date": "2025-06-16",
+      "hour": 1,
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "MCP项目代码提交，包含分析API、前端开发助手、使用追踪等功能模块的修改和新增"
+      },
+      "execution_time_ms": 12.26,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 815,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750009939067_smart_feedback_collector",
+      "tool_name": "smart_feedback_collector",
+      "timestamp": "2025-06-16T01:52:19.067658",
+      "date": "2025-06-16",
+      "hour": 1,
+      "arguments": {
+        "task_summary": "制定了MCP项目的分批次代码提交计划，按功能模块分为8个批次，包含依赖更新、API模块、Git集成、前端助手增强、配置文档、测试和数据文件等，等待用户确认后执行提交"
+      },
+      "execution_time_ms": 4.84,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 569,
+      "user_agent": "cursor-mcp"
+    }
+  ],
+  "daily_stats": {
+    "2025-06-13": {
+      "total_calls": 1,
+      "successful_calls": 1,
+      "failed_calls": 0,
+      "total_execution_time_ms": 9.46,
+      "avg_execution_time_ms": 9.46,
+      "tool_breakdown": {
+        "smart_feedback_collector": 1
+      },
+      "hourly_distribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 1,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      }
+    },
+    "2025-06-14": {
+      "total_calls": 5,
+      "successful_calls": 5,
+      "failed_calls": 0,
+      "total_execution_time_ms": 401.86,
+      "avg_execution_time_ms": 80.372,
+      "tool_breakdown": {
+        "track_usage": 3,
+        "smart_feedback_collector": 1,
+        "get_prompt_template": 1
+      },
+      "hourly_distribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 1,
+        "16": 0,
+        "17": 2,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 2
+      }
+    },
+    "2025-06-15": {
+      "total_calls": 1,
+      "successful_calls": 1,
+      "failed_calls": 0,
+      "total_execution_time_ms": 9.77,
+      "avg_execution_time_ms": 9.77,
+      "tool_breakdown": {
+        "track_usage": 1
+      },
+      "hourly_distribution": {
+        "0": 0,
+        "1": 0,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 1,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      }
+    },
+    "2025-06-16": {
+      "total_calls": 6,
+      "successful_calls": 6,
+      "failed_calls": 0,
+      "total_execution_time_ms": 38.55,
+      "avg_execution_time_ms": 6.425,
+      "tool_breakdown": {
+        "get_prompt_template": 4,
+        "track_usage": 1,
+        "smart_feedback_collector": 1
+      },
+      "hourly_distribution": {
+        "0": 0,
+        "1": 6,
+        "2": 0,
+        "3": 0,
+        "4": 0,
+        "5": 0,
+        "6": 0,
+        "7": 0,
+        "8": 0,
+        "9": 0,
+        "10": 0,
+        "11": 0,
+        "12": 0,
+        "13": 0,
+        "14": 0,
+        "15": 0,
+        "16": 0,
+        "17": 0,
+        "18": 0,
+        "19": 0,
+        "20": 0,
+        "21": 0,
+        "22": 0,
+        "23": 0
+      }
+    }
+  },
+  "tool_stats": {
+    "smart_feedback_collector": {
+      "total_calls": 3,
+      "successful_calls": 3,
+      "failed_calls": 0,
+      "first_used": "2025-06-13T17:30:36.812306",
+      "last_used": "2025-06-16T01:52:19.067658",
+      "avg_execution_time_ms": 11.719999999999999,
+      "total_execution_time_ms": 35.16,
+      "common_arguments": {
+        "task_summary": {
+          "开发分销规则页面，包含列表展示、搜索、新增、编辑、删除功能，使用Element Plus组件构建用户": 1,
+          "用户非常愤怒地指出我在分销商管理页面中的表格列定义都对不上，需要立即修复所有字段不匹配的问题": 1,
+          "制定了MCP项目的分批次代码提交计划，按功能模块分为8个批次，包含依赖更新、API模块、Git集成、": 1
+        }
+      },
+      "error_patterns": []
+    },
+    "track_usage": {
+      "total_calls": 5,
+      "successful_calls": 5,
+      "failed_calls": 0,
+      "first_used": "2025-06-14T15:54:14.555876",
+      "last_used": "2025-06-16T01:41:23.705987",
+      "avg_execution_time_ms": 75.982,
+      "total_execution_time_ms": 379.91,
+      "common_arguments": {
+        "tool_name": {
+          "登录页面迁移": 1,
+          "smart_feedback_collector": 1,
+          "代码修复调试": 1,
+          "环境变量配置修复": 1,
+          "get_prompt_template": 1
+        },
+        "usage_context": {
+          "将driver-coach-admin-element项目的登录页面迁移到element-plus-": 1,
+          "收集用户对表格字段定义错误修复任务的反馈": 1,
+          "修复 pnpm run preview 预览白屏问题，解决路由无限重定向循环，修复authStore": 1,
+          "修复生产环境接口调用错误，调整成功码配置格式": 1,
+          "用户获取组件复用提示词模板": 1
+        },
+        "user_feedback": {
+          "excellent": 3,
+          "poor": 1,
+          "good": 1
+        }
+      },
+      "error_patterns": []
+    },
+    "get_prompt_template": {
+      "total_calls": 5,
+      "successful_calls": 5,
+      "failed_calls": 0,
+      "first_used": "2025-06-14T23:48:35.488048",
+      "last_used": "2025-06-16T01:51:36.963975",
+      "avg_execution_time_ms": 8.914,
+      "total_execution_time_ms": 44.57,
+      "common_arguments": {
+        "prompt_type": {
+          "git_commit": 4,
+          "component_reuse": 1
+        },
+        "context": {
+          "修复了pnpm run preview预览白屏问题，主要解决了路由无限重定向循环问题，修复了auth": 1,
+          "前端项目代码提交": 1,
+          "用户需要生成组件的提示词": 1,
+          "MCP项目代码提交，包含分析API、前端开发助手、使用追踪等功能模块的修改和新增": 1
+        }
+      },
+      "error_patterns": []
+    }
+  }
+}

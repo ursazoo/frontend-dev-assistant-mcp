@@ -30,19 +30,49 @@
       "tool_breakdown": {
         "test": 2
       }
+    },
+    "2025-06-13": {
+      "total_calls": 1,
+      "tool_breakdown": {
+        "smart_feedback_collector": 1
+      }
+    },
+    "2025-06-14": {
+      "total_calls": 5,
+      "tool_breakdown": {
+        "track_usage": 3,
+        "smart_feedback_collector": 1,
+        "get_prompt_template": 1
+      }
+    },
+    "2025-06-15": {
+      "total_calls": 1,
+      "tool_breakdown": {
+        "track_usage": 1
+      }
+    },
+    "2025-06-16": {
+      "total_calls": 6,
+      "tool_breakdown": {
+        "get_prompt_template": 4,
+        "track_usage": 1,
+        "smart_feedback_collector": 1
+      }
     }
   },
   "tool_usage": {
     "get_prompt_template": {
-      "total_uses": 4,
+      "total_uses": 9,
       "first_used": "2025-06-02T22:47:45.242844",
-      "last_used": "2025-06-02T22:54:09.406459",
+      "last_used": "2025-06-16T01:51:36.960879",
       "feedback_scores": [
         5,
-        5
+        5,
+        4
       ],
       "contexts": [
-        "提交代码场景"
+        "提交代码场景",
+        "用户获取组件复用提示词模板"
       ]
     },
     "generate_vue_component": {
@@ -65,11 +95,22 @@
       "contexts": []
     },
     "track_usage": {
-      "total_uses": 4,
+      "total_uses": 9,
       "first_used": "2025-06-04T11:32:35.858264",
-      "last_used": "2025-06-04T11:46:59.079924",
+      "last_used": "2025-06-16T01:41:23.704158",
       "feedback_scores": [],
       "contexts": []
+    },
+    "smart_feedback_collector": {
+      "total_uses": 3,
+      "first_used": "2025-06-13T17:30:36.808153",
+      "last_used": "2025-06-16T01:52:19.064113",
+      "feedback_scores": [
+        2
+      ],
+      "contexts": [
+        "收集用户对表格字段定义错误修复任务的反馈"
+      ]
     }
   },
   "user_feedback": [
@@ -136,6 +177,105 @@
       "context": "修复编辑桌台时 setInputValue 方法不存在的报错，改为直接设置 actionSheet 的 num 属性",
       "timestamp": "2025-06-04T11:46:59.078068",
       "user_id": "rabbitsbear"
+    },
+    {
+      "id": "b5b5d7fb-8215-4b45-acfa-acc3553015c7",
+      "tool_name": "cursor_component_generation",
+      "feedback": "good",
+      "context": "生成Vue3组件 - UserProfile.vue",
+      "timestamp": "2025-06-13T16:11:07.330223",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "6ebbbdd9-6126-48c6-923e-08466691f4f6"
+    },
+    {
+      "id": "349119e5-8f5f-479f-8148-15571c285cfa",
+      "tool_name": "ai_code_refactor",
+      "feedback": "excellent",
+      "context": "重构支付模块代码",
+      "timestamp": "2025-06-13T16:11:07.331043",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "5f3e4640-a7d6-46f1-ad03-576b5c3a9884"
+    },
+    {
+      "id": "22c0bc57-e4dc-4a60-9b93-bb0ce9f0a2ad",
+      "tool_name": "miniprogram_page_gen",
+      "feedback": "average",
+      "context": "生成微信小程序商品列表页",
+      "timestamp": "2025-06-13T16:11:07.331773",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "7b3c37b1-00d6-4cba-bb6e-2da0c56f5beb"
+    },
+    {
+      "id": "bee38544-4dd1-437a-92ad-65f65c5e3a29",
+      "tool_name": "typescript_types_gen",
+      "feedback": "excellent",
+      "context": "生成API接口类型定义",
+      "timestamp": "2025-06-13T16:11:07.332645",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "99100b3e-1f1f-4890-9a84-d00fa25efc5d"
+    },
+    {
+      "id": "5e7b1d97-def2-4ce9-9908-78ddc018a5cb",
+      "tool_name": "vue3_component_generation",
+      "feedback": "excellent",
+      "context": "",
+      "timestamp": "2025-06-13T16:11:07.515733",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "ef9f19c4-e3b9-4d23-a15e-82506737ec9c"
+    },
+    {
+      "id": "35bcfa7f-8a3d-4064-b2e4-1e5c5a9dfd71",
+      "tool_name": "vue3_component_generation",
+      "feedback": "good",
+      "context": "",
+      "timestamp": "2025-06-13T16:11:07.516743",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "53d3291b-63bf-4949-882c-d9c2a0058c9f"
+    },
+    {
+      "id": "64b39cd5-be0a-4024-858d-19d421fa2e02",
+      "tool_name": "登录页面迁移",
+      "feedback": "excellent",
+      "context": "将driver-coach-admin-element项目的登录页面迁移到element-plus-vite-starter项目，去除国际化和主题配置，保持核心功能",
+      "timestamp": "2025-06-14T15:54:14.422136",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "961d16cf-be30-44ad-8471-cc804072df7f"
+    },
+    {
+      "id": "248ad112-14f2-44d6-b89f-42cd15535149",
+      "tool_name": "smart_feedback_collector",
+      "feedback": "poor",
+      "context": "收集用户对表格字段定义错误修复任务的反馈",
+      "timestamp": "2025-06-14T17:19:07.546749",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "e012b964-1a54-4c34-8141-f53ba264a39f"
+    },
+    {
+      "id": "3d9b9107-fab5-4db2-be07-849afad5ea9a",
+      "tool_name": "代码修复调试",
+      "feedback": "excellent",
+      "context": "修复 pnpm run preview 预览白屏问题，解决路由无限重定向循环，修复authStore.initUserInfo空实现和onRouteSwitchWhenNotLoggedIn方法逻辑错误",
+      "timestamp": "2025-06-14T23:49:21.323408",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "79a1740c-2241-4808-9533-fa3f89820b54"
+    },
+    {
+      "id": "cc0273e2-6660-45e4-8f11-f67398d3adbd",
+      "tool_name": "环境变量配置修复",
+      "feedback": "excellent",
+      "context": "修复生产环境接口调用错误，调整成功码配置格式",
+      "timestamp": "2025-06-15T12:31:50.279512",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "702cd329-fb1d-400d-a705-8248b2e66bb4"
+    },
+    {
+      "id": "532fd680-997d-450d-9aae-c1f1e44ed2ba",
+      "tool_name": "get_prompt_template",
+      "feedback": "good",
+      "context": "用户获取组件复用提示词模板",
+      "timestamp": "2025-06-16T01:41:23.702286",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "22efc278-700e-48f0-86b7-7dbeaf1ff775"
     }
   ],
   "usage_logs": [
@@ -346,6 +486,468 @@
       "date": "2025-06-06",
       "arguments": {},
       "user_id": "rabbitsbear"
+    },
+    {
+      "id": "89965955-a32b-4bd5-a652-d2f128384b4e",
+      "tool_name": "smart_feedback_collector",
+      "timestamp": "2025-06-13T17:30:36.808153",
+      "date": "2025-06-13",
+      "arguments": {
+        "task_summary": "开发分销规则页面，包含列表展示、搜索、新增、编辑、删除功能，使用Element Plus组件构建用户界面"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "1aeec4ab-a31c-4d7a-a475-9853a0539da1",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-14T15:54:14.536007",
+      "date": "2025-06-14",
+      "arguments": {
+        "tool_name": "登录页面迁移",
+        "usage_context": "将driver-coach-admin-element项目的登录页面迁移到element-plus-vite-starter项目，去除国际化和主题配置，保持核心功能",
+        "user_feedback": "excellent"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "f1d366ce-db31-444b-993b-fdd77b2f56e5",
+      "tool_name": "smart_feedback_collector",
+      "timestamp": "2025-06-14T17:18:19.037256",
+      "date": "2025-06-14",
+      "arguments": {
+        "task_summary": "用户非常愤怒地指出我在分销商管理页面中的表格列定义都对不上，需要立即修复所有字段不匹配的问题"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "64a3a90a-29fa-4313-bf6f-f2bcc0bc9152",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-14T17:19:07.549129",
+      "date": "2025-06-14",
+      "arguments": {
+        "tool_name": "smart_feedback_collector",
+        "usage_context": "收集用户对表格字段定义错误修复任务的反馈",
+        "user_feedback": "poor"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "8b5b2f6d-fd63-4c59-90ee-66fd356bb37b",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-14T23:48:35.485865",
+      "date": "2025-06-14",
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "修复了pnpm run preview预览白屏问题，主要解决了路由无限重定向循环问题，修复了authStore.initUserInfo空实现和onRouteSwitchWhenNotLoggedIn方法逻辑错误"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "e88af981-5843-4a5f-9f58-10d6302a3b1c",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-14T23:49:21.324672",
+      "date": "2025-06-14",
+      "arguments": {
+        "tool_name": "代码修复调试",
+        "usage_context": "修复 pnpm run preview 预览白屏问题，解决路由无限重定向循环，修复authStore.initUserInfo空实现和onRouteSwitchWhenNotLoggedIn方法逻辑错误",
+        "user_feedback": "excellent"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "376c99d0-f2a8-4dd8-b6ad-e7836f5f7447",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-15T12:31:50.282830",
+      "date": "2025-06-15",
+      "arguments": {
+        "tool_name": "环境变量配置修复",
+        "usage_context": "修复生产环境接口调用错误，调整成功码配置格式",
+        "user_feedback": "excellent"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "ac9248cb-33f2-4cec-b6d3-b8febddfff76",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:39:37.164610",
+      "date": "2025-06-16",
+      "arguments": {
+        "prompt_type": "git_commit"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "9d1f146a-5b33-4392-a3cf-0b6fd5526a02",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:40:37.157827",
+      "date": "2025-06-16",
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "前端项目代码提交"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "c1a3cb3d-cd04-4139-bfa3-2e1593906e1a",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:41:17.265116",
+      "date": "2025-06-16",
+      "arguments": {
+        "prompt_type": "component_reuse",
+        "context": "用户需要生成组件的提示词"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "ebc8fe94-1f40-445f-9be7-cf84a002f7e9",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T01:41:23.704158",
+      "date": "2025-06-16",
+      "arguments": {
+        "tool_name": "get_prompt_template",
+        "usage_context": "用户获取组件复用提示词模板",
+        "user_feedback": "good"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "99568e68-3fb6-4780-b9e5-ea33603858b7",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:51:36.960879",
+      "date": "2025-06-16",
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "MCP项目代码提交，包含分析API、前端开发助手、使用追踪等功能模块的修改和新增"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "a8463af5-f273-411c-b8c4-bcc501954511",
+      "tool_name": "smart_feedback_collector",
+      "timestamp": "2025-06-16T01:52:19.064113",
+      "date": "2025-06-16",
+      "arguments": {
+        "task_summary": "制定了MCP项目的分批次代码提交计划，按功能模块分为8个批次，包含依赖更新、API模块、Git集成、前端助手增强、配置文档、测试和数据文件等，等待用户确认后执行提交"
+      },
+      "user_id": "rabbitsbear"
     }
-  ]
+  ],
+  "enhanced_usage_logs": [
+    {
+      "id": "6ebbbdd9-6126-48c6-923e-08466691f4f6",
+      "tool_name": "cursor_component_generation",
+      "timestamp": "2025-06-13T16:11:07.330223",
+      "date": "2025-06-13",
+      "user_id": "rabbitsbear",
+      "context": "生成Vue3组件 - UserProfile.vue",
+      "user_feedback": "good",
+      "ai_metrics": {
+        "session_duration": 15,
+        "files_modified": 2,
+        "lines_generated": 85,
+        "lines_deleted": 12,
+        "complexity_added": 8,
+        "ai_probability": 0.7,
+        "quality_score": 75,
+        "has_comments": true,
+        "has_error_handling": true,
+        "has_type_annotations": false,
+        "function_count": 4,
+        "productivity_score": 0.82,
+        "efficiency_rating": "优秀"
+      }
+    },
+    {
+      "id": "5f3e4640-a7d6-46f1-ad03-576b5c3a9884",
+      "tool_name": "ai_code_refactor",
+      "timestamp": "2025-06-13T16:11:07.331043",
+      "date": "2025-06-13",
+      "user_id": "rabbitsbear",
+      "context": "重构支付模块代码",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 25,
+        "files_modified": 3,
+        "lines_generated": 45,
+        "lines_deleted": 30,
+        "complexity_added": 12,
+        "ai_probability": 0.5,
+        "quality_score": 85,
+        "has_comments": true,
+        "has_error_handling": true,
+        "has_type_annotations": true,
+        "function_count": 6,
+        "productivity_score": 0.81,
+        "efficiency_rating": "良好"
+      }
+    },
+    {
+      "id": "7b3c37b1-00d6-4cba-bb6e-2da0c56f5beb",
+      "tool_name": "miniprogram_page_gen",
+      "timestamp": "2025-06-13T16:11:07.331773",
+      "date": "2025-06-13",
+      "user_id": "rabbitsbear",
+      "context": "生成微信小程序商品列表页",
+      "user_feedback": "average",
+      "ai_metrics": {
+        "session_duration": 18,
+        "files_modified": 4,
+        "lines_generated": 120,
+        "lines_deleted": 5,
+        "complexity_added": 15,
+        "ai_probability": 0.9,
+        "quality_score": 65,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 8,
+        "productivity_score": 0.94,
+        "efficiency_rating": "一般"
+      }
+    },
+    {
+      "id": "99100b3e-1f1f-4890-9a84-d00fa25efc5d",
+      "tool_name": "typescript_types_gen",
+      "timestamp": "2025-06-13T16:11:07.332645",
+      "date": "2025-06-13",
+      "user_id": "rabbitsbear",
+      "context": "生成API接口类型定义",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 8,
+        "files_modified": 1,
+        "lines_generated": 25,
+        "lines_deleted": 2,
+        "complexity_added": 3,
+        "ai_probability": 0.4,
+        "quality_score": 90,
+        "has_comments": true,
+        "has_error_handling": false,
+        "has_type_annotations": true,
+        "function_count": 2,
+        "productivity_score": 0.5,
+        "efficiency_rating": "优秀"
+      }
+    },
+    {
+      "id": "ef9f19c4-e3b9-4d23-a15e-82506737ec9c",
+      "tool_name": "vue3_component_generation",
+      "timestamp": "2025-06-13T16:11:07.515733",
+      "date": "2025-06-13",
+      "user_id": "rabbitsbear",
+      "context": "",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "53d3291b-63bf-4949-882c-d9c2a0058c9f",
+      "tool_name": "vue3_component_generation",
+      "timestamp": "2025-06-13T16:11:07.516743",
+      "date": "2025-06-13",
+      "user_id": "rabbitsbear",
+      "context": "",
+      "user_feedback": "good",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "961d16cf-be30-44ad-8471-cc804072df7f",
+      "tool_name": "登录页面迁移",
+      "timestamp": "2025-06-14T15:54:14.422136",
+      "date": "2025-06-14",
+      "user_id": "rabbitsbear",
+      "context": "将driver-coach-admin-element项目的登录页面迁移到element-plus-vite-starter项目，去除国际化和主题配置，保持核心功能",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "e012b964-1a54-4c34-8141-f53ba264a39f",
+      "tool_name": "smart_feedback_collector",
+      "timestamp": "2025-06-14T17:19:07.546749",
+      "date": "2025-06-14",
+      "user_id": "rabbitsbear",
+      "context": "收集用户对表格字段定义错误修复任务的反馈",
+      "user_feedback": "poor",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "79a1740c-2241-4808-9533-fa3f89820b54",
+      "tool_name": "代码修复调试",
+      "timestamp": "2025-06-14T23:49:21.323408",
+      "date": "2025-06-14",
+      "user_id": "rabbitsbear",
+      "context": "修复 pnpm run preview 预览白屏问题，解决路由无限重定向循环，修复authStore.initUserInfo空实现和onRouteSwitchWhenNotLoggedIn方法逻辑错误",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "702cd329-fb1d-400d-a705-8248b2e66bb4",
+      "tool_name": "环境变量配置修复",
+      "timestamp": "2025-06-15T12:31:50.279512",
+      "date": "2025-06-15",
+      "user_id": "rabbitsbear",
+      "context": "修复生产环境接口调用错误，调整成功码配置格式",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "22efc278-700e-48f0-86b7-7dbeaf1ff775",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T01:41:23.702286",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "用户获取组件复用提示词模板",
+      "user_feedback": "good",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    }
+  ],
+  "daily_ai_stats": {
+    "2025-06-13": {
+      "total_sessions": 6,
+      "total_lines_generated": 275,
+      "total_files_modified": 10,
+      "avg_ai_probability": 0.417,
+      "avg_quality_score": 52.5,
+      "avg_productivity": 0.512,
+      "tool_breakdown": {
+        "cursor_component_generation": 1,
+        "ai_code_refactor": 1,
+        "miniprogram_page_gen": 1,
+        "typescript_types_gen": 1,
+        "vue3_component_generation": 2
+      }
+    },
+    "2025-06-14": {
+      "total_sessions": 3,
+      "total_lines_generated": 0,
+      "total_files_modified": 0,
+      "avg_ai_probability": 0.0,
+      "avg_quality_score": 0.0,
+      "avg_productivity": 0.0,
+      "tool_breakdown": {
+        "登录页面迁移": 1,
+        "smart_feedback_collector": 1,
+        "代码修复调试": 1
+      }
+    },
+    "2025-06-15": {
+      "total_sessions": 1,
+      "total_lines_generated": 0,
+      "total_files_modified": 0,
+      "avg_ai_probability": 0,
+      "avg_quality_score": 0,
+      "avg_productivity": 0.0,
+      "tool_breakdown": {
+        "环境变量配置修复": 1
+      }
+    },
+    "2025-06-16": {
+      "total_sessions": 1,
+      "total_lines_generated": 0,
+      "total_files_modified": 0,
+      "avg_ai_probability": 0,
+      "avg_quality_score": 0,
+      "avg_productivity": 0.0,
+      "tool_breakdown": {
+        "get_prompt_template": 1
+      }
+    }
+  }
 }
