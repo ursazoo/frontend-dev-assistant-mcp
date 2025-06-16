@@ -33,15 +33,12 @@
     },
     "2025-06-13": {
       "total_calls": 1,
-      "tool_breakdown": {
-        "smart_feedback_collector": 1
-      }
+      "tool_breakdown": {}
     },
     "2025-06-14": {
       "total_calls": 5,
       "tool_breakdown": {
         "track_usage": 3,
-        "smart_feedback_collector": 1,
         "get_prompt_template": 1
       }
     },
@@ -52,19 +49,18 @@
       }
     },
     "2025-06-16": {
-      "total_calls": 6,
+      "total_calls": 8,
       "tool_breakdown": {
-        "get_prompt_template": 4,
-        "track_usage": 1,
-        "smart_feedback_collector": 1
+        "get_prompt_template": 5,
+        "track_usage": 2
       }
     }
   },
   "tool_usage": {
     "get_prompt_template": {
-      "total_uses": 9,
+      "total_uses": 10,
       "first_used": "2025-06-02T22:47:45.242844",
-      "last_used": "2025-06-16T01:51:36.960879",
+      "last_used": "2025-06-16T08:55:33.352452",
       "feedback_scores": [
         5,
         5,
@@ -95,22 +91,11 @@
       "contexts": []
     },
     "track_usage": {
-      "total_uses": 9,
+      "total_uses": 10,
       "first_used": "2025-06-04T11:32:35.858264",
-      "last_used": "2025-06-16T01:41:23.704158",
+      "last_used": "2025-06-16T01:54:17.670805",
       "feedback_scores": [],
       "contexts": []
-    },
-    "smart_feedback_collector": {
-      "total_uses": 3,
-      "first_used": "2025-06-13T17:30:36.808153",
-      "last_used": "2025-06-16T01:52:19.064113",
-      "feedback_scores": [
-        2
-      ],
-      "contexts": [
-        "收集用户对表格字段定义错误修复任务的反馈"
-      ]
     }
   },
   "user_feedback": [
@@ -242,15 +227,6 @@
       "enhanced_usage_id": "961d16cf-be30-44ad-8471-cc804072df7f"
     },
     {
-      "id": "248ad112-14f2-44d6-b89f-42cd15535149",
-      "tool_name": "smart_feedback_collector",
-      "feedback": "poor",
-      "context": "收集用户对表格字段定义错误修复任务的反馈",
-      "timestamp": "2025-06-14T17:19:07.546749",
-      "user_id": "rabbitsbear",
-      "enhanced_usage_id": "e012b964-1a54-4c34-8141-f53ba264a39f"
-    },
-    {
       "id": "3d9b9107-fab5-4db2-be07-849afad5ea9a",
       "tool_name": "代码修复调试",
       "feedback": "excellent",
@@ -276,6 +252,51 @@
       "timestamp": "2025-06-16T01:41:23.702286",
       "user_id": "rabbitsbear",
       "enhanced_usage_id": "22efc278-700e-48f0-86b7-7dbeaf1ff775"
+    },
+    {
+      "id": "6d0a2fb3-8030-42c3-9416-9cf863aeca5d",
+      "tool_name": "git_commit_assistant",
+      "feedback": "excellent",
+      "context": "协助用户按照Conventional Commits规范分批次提交MCP项目代码，包含8个功能模块的修改和新增文件",
+      "timestamp": "2025-06-16T01:54:17.667994",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "de841b80-effc-4aec-9de1-637cbfca98b9"
+    },
+    {
+      "id": "e62d791c-4fdf-4eef-8f7a-c87b54d00a8e",
+      "tool_name": "cursor_component_generation",
+      "feedback": "good",
+      "context": "生成Vue3组件 - UserProfile.vue",
+      "timestamp": "2025-06-16T02:03:54.512683",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "564ff1e8-c1ba-4242-85fb-752ca7080dd0"
+    },
+    {
+      "id": "e28e19f7-88a7-4c6c-b2c7-184b41c57635",
+      "tool_name": "ai_code_refactor",
+      "feedback": "excellent",
+      "context": "重构支付模块代码",
+      "timestamp": "2025-06-16T02:03:54.513723",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "c4bb2cfc-7ae1-4d48-9055-653a7efe1fd4"
+    },
+    {
+      "id": "e9d3dabd-d08e-4df9-98a8-96d761a62bac",
+      "tool_name": "miniprogram_page_gen",
+      "feedback": "average",
+      "context": "生成微信小程序商品列表页",
+      "timestamp": "2025-06-16T02:03:54.514661",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "0abf0deb-4240-4326-81c4-84bb86de6e71"
+    },
+    {
+      "id": "01f9c82c-713b-4c6d-8af4-43f6ff4b4bbb",
+      "tool_name": "typescript_types_gen",
+      "feedback": "excellent",
+      "context": "生成API接口类型定义",
+      "timestamp": "2025-06-16T02:03:54.515628",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "8b5ce7fc-7e42-46e0-ab26-e34a3d849374"
     }
   ],
   "usage_logs": [
@@ -488,16 +509,6 @@
       "user_id": "rabbitsbear"
     },
     {
-      "id": "89965955-a32b-4bd5-a652-d2f128384b4e",
-      "tool_name": "smart_feedback_collector",
-      "timestamp": "2025-06-13T17:30:36.808153",
-      "date": "2025-06-13",
-      "arguments": {
-        "task_summary": "开发分销规则页面，包含列表展示、搜索、新增、编辑、删除功能，使用Element Plus组件构建用户界面"
-      },
-      "user_id": "rabbitsbear"
-    },
-    {
       "id": "1aeec4ab-a31c-4d7a-a475-9853a0539da1",
       "tool_name": "track_usage",
       "timestamp": "2025-06-14T15:54:14.536007",
@@ -506,16 +517,6 @@
         "tool_name": "登录页面迁移",
         "usage_context": "将driver-coach-admin-element项目的登录页面迁移到element-plus-vite-starter项目，去除国际化和主题配置，保持核心功能",
         "user_feedback": "excellent"
-      },
-      "user_id": "rabbitsbear"
-    },
-    {
-      "id": "f1d366ce-db31-444b-993b-fdd77b2f56e5",
-      "tool_name": "smart_feedback_collector",
-      "timestamp": "2025-06-14T17:18:19.037256",
-      "date": "2025-06-14",
-      "arguments": {
-        "task_summary": "用户非常愤怒地指出我在分销商管理页面中的表格列定义都对不上，需要立即修复所有字段不匹配的问题"
       },
       "user_id": "rabbitsbear"
     },
@@ -622,12 +623,25 @@
       "user_id": "rabbitsbear"
     },
     {
-      "id": "a8463af5-f273-411c-b8c4-bcc501954511",
-      "tool_name": "smart_feedback_collector",
-      "timestamp": "2025-06-16T01:52:19.064113",
+      "id": "e4780acc-eff2-438a-8d23-3ef32f9e6c8c",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T01:54:17.670805",
       "date": "2025-06-16",
       "arguments": {
-        "task_summary": "制定了MCP项目的分批次代码提交计划，按功能模块分为8个批次，包含依赖更新、API模块、Git集成、前端助手增强、配置文档、测试和数据文件等，等待用户确认后执行提交"
+        "tool_name": "git_commit_assistant",
+        "usage_context": "协助用户按照Conventional Commits规范分批次提交MCP项目代码，包含8个功能模块的修改和新增文件",
+        "user_feedback": "excellent"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "0da95713-aa65-40c4-8fff-12f8bec36311",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T08:55:33.352452",
+      "date": "2025-06-16",
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和相关配置，简化MCP项目结构"
       },
       "user_id": "rabbitsbear"
     }
@@ -802,30 +816,6 @@
       }
     },
     {
-      "id": "e012b964-1a54-4c34-8141-f53ba264a39f",
-      "tool_name": "smart_feedback_collector",
-      "timestamp": "2025-06-14T17:19:07.546749",
-      "date": "2025-06-14",
-      "user_id": "rabbitsbear",
-      "context": "收集用户对表格字段定义错误修复任务的反馈",
-      "user_feedback": "poor",
-      "ai_metrics": {
-        "session_duration": 0,
-        "files_modified": 0,
-        "lines_generated": 0,
-        "lines_deleted": 0,
-        "complexity_added": 0,
-        "ai_probability": 0,
-        "quality_score": 0,
-        "has_comments": false,
-        "has_error_handling": false,
-        "has_type_annotations": false,
-        "function_count": 0,
-        "productivity_score": 0.0,
-        "efficiency_rating": "未知"
-      }
-    },
-    {
       "id": "79a1740c-2241-4808-9533-fa3f89820b54",
       "tool_name": "代码修复调试",
       "timestamp": "2025-06-14T23:49:21.323408",
@@ -896,6 +886,126 @@
         "productivity_score": 0.0,
         "efficiency_rating": "未知"
       }
+    },
+    {
+      "id": "de841b80-effc-4aec-9de1-637cbfca98b9",
+      "tool_name": "git_commit_assistant",
+      "timestamp": "2025-06-16T01:54:17.667994",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "协助用户按照Conventional Commits规范分批次提交MCP项目代码，包含8个功能模块的修改和新增文件",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "564ff1e8-c1ba-4242-85fb-752ca7080dd0",
+      "tool_name": "cursor_component_generation",
+      "timestamp": "2025-06-16T02:03:54.512683",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "生成Vue3组件 - UserProfile.vue",
+      "user_feedback": "good",
+      "ai_metrics": {
+        "session_duration": 15,
+        "files_modified": 2,
+        "lines_generated": 85,
+        "lines_deleted": 12,
+        "complexity_added": 8,
+        "ai_probability": 0.7,
+        "quality_score": 75,
+        "has_comments": true,
+        "has_error_handling": true,
+        "has_type_annotations": false,
+        "function_count": 4,
+        "productivity_score": 0.82,
+        "efficiency_rating": "优秀"
+      }
+    },
+    {
+      "id": "c4bb2cfc-7ae1-4d48-9055-653a7efe1fd4",
+      "tool_name": "ai_code_refactor",
+      "timestamp": "2025-06-16T02:03:54.513723",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "重构支付模块代码",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 25,
+        "files_modified": 3,
+        "lines_generated": 45,
+        "lines_deleted": 30,
+        "complexity_added": 12,
+        "ai_probability": 0.5,
+        "quality_score": 85,
+        "has_comments": true,
+        "has_error_handling": true,
+        "has_type_annotations": true,
+        "function_count": 6,
+        "productivity_score": 0.81,
+        "efficiency_rating": "良好"
+      }
+    },
+    {
+      "id": "0abf0deb-4240-4326-81c4-84bb86de6e71",
+      "tool_name": "miniprogram_page_gen",
+      "timestamp": "2025-06-16T02:03:54.514661",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "生成微信小程序商品列表页",
+      "user_feedback": "average",
+      "ai_metrics": {
+        "session_duration": 18,
+        "files_modified": 4,
+        "lines_generated": 120,
+        "lines_deleted": 5,
+        "complexity_added": 15,
+        "ai_probability": 0.9,
+        "quality_score": 65,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 8,
+        "productivity_score": 0.94,
+        "efficiency_rating": "一般"
+      }
+    },
+    {
+      "id": "8b5ce7fc-7e42-46e0-ab26-e34a3d849374",
+      "tool_name": "typescript_types_gen",
+      "timestamp": "2025-06-16T02:03:54.515628",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "生成API接口类型定义",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 8,
+        "files_modified": 1,
+        "lines_generated": 25,
+        "lines_deleted": 2,
+        "complexity_added": 3,
+        "ai_probability": 0.4,
+        "quality_score": 90,
+        "has_comments": true,
+        "has_error_handling": false,
+        "has_type_annotations": true,
+        "function_count": 2,
+        "productivity_score": 0.5,
+        "efficiency_rating": "优秀"
+      }
     }
   ],
   "daily_ai_stats": {
@@ -923,7 +1033,6 @@
       "avg_productivity": 0.0,
       "tool_breakdown": {
         "登录页面迁移": 1,
-        "smart_feedback_collector": 1,
         "代码修复调试": 1
       }
     },
@@ -939,14 +1048,19 @@
       }
     },
     "2025-06-16": {
-      "total_sessions": 1,
-      "total_lines_generated": 0,
-      "total_files_modified": 0,
-      "avg_ai_probability": 0,
-      "avg_quality_score": 0,
-      "avg_productivity": 0.0,
+      "total_sessions": 6,
+      "total_lines_generated": 275,
+      "total_files_modified": 10,
+      "avg_ai_probability": 0.417,
+      "avg_quality_score": 52.5,
+      "avg_productivity": 0.512,
       "tool_breakdown": {
-        "get_prompt_template": 1
+        "get_prompt_template": 1,
+        "git_commit_assistant": 1,
+        "cursor_component_generation": 1,
+        "ai_code_refactor": 1,
+        "miniprogram_page_gen": 1,
+        "typescript_types_gen": 1
       }
     }
   }

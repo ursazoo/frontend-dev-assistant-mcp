@@ -6,21 +6,6 @@
   },
   "calls": [
     {
-      "id": "1749807036812_smart_feedback_collector",
-      "tool_name": "smart_feedback_collector",
-      "timestamp": "2025-06-13T17:30:36.812306",
-      "date": "2025-06-13",
-      "hour": 17,
-      "arguments": {
-        "task_summary": "开发分销规则页面，包含列表展示、搜索、新增、编辑、删除功能，使用Element Plus组件构建用户界面"
-      },
-      "execution_time_ms": 9.46,
-      "success": true,
-      "error_message": null,
-      "result_size_bytes": 475,
-      "user_agent": "cursor-mcp"
-    },
-    {
       "id": "1749887654560_track_usage",
       "tool_name": "track_usage",
       "timestamp": "2025-06-14T15:54:14.555876",
@@ -35,21 +20,6 @@
       "success": true,
       "error_message": null,
       "result_size_bytes": 65,
-      "user_agent": "cursor-mcp"
-    },
-    {
-      "id": "1749892699044_smart_feedback_collector",
-      "tool_name": "smart_feedback_collector",
-      "timestamp": "2025-06-14T17:18:19.044423",
-      "date": "2025-06-14",
-      "hour": 17,
-      "arguments": {
-        "task_summary": "用户非常愤怒地指出我在分销商管理页面中的表格列定义都对不上，需要立即修复所有字段不匹配的问题"
-      },
-      "execution_time_ms": 20.86,
-      "success": true,
-      "error_message": null,
-      "result_size_bytes": 481,
       "user_agent": "cursor-mcp"
     },
     {
@@ -200,18 +170,36 @@
       "user_agent": "cursor-mcp"
     },
     {
-      "id": "1750009939067_smart_feedback_collector",
-      "tool_name": "smart_feedback_collector",
-      "timestamp": "2025-06-16T01:52:19.067658",
+      "id": "1750010057672_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T01:54:17.672043",
       "date": "2025-06-16",
       "hour": 1,
       "arguments": {
-        "task_summary": "制定了MCP项目的分批次代码提交计划，按功能模块分为8个批次，包含依赖更新、API模块、Git集成、前端助手增强、配置文档、测试和数据文件等，等待用户确认后执行提交"
+        "tool_name": "git_commit_assistant",
+        "usage_context": "协助用户按照Conventional Commits规范分批次提交MCP项目代码，包含8个功能模块的修改和新增文件",
+        "user_feedback": "excellent"
       },
-      "execution_time_ms": 4.84,
+      "execution_time_ms": 6.41,
       "success": true,
       "error_message": null,
-      "result_size_bytes": 569,
+      "result_size_bytes": 67,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750035333354_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T08:55:33.354079",
+      "date": "2025-06-16",
+      "hour": 8,
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和相关配置，简化MCP项目结构"
+      },
+      "execution_time_ms": 6.74,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 833,
       "user_agent": "cursor-mcp"
     }
   ],
@@ -222,9 +210,7 @@
       "failed_calls": 0,
       "total_execution_time_ms": 9.46,
       "avg_execution_time_ms": 9.46,
-      "tool_breakdown": {
-        "smart_feedback_collector": 1
-      },
+      "tool_breakdown": {},
       "hourly_distribution": {
         "0": 0,
         "1": 0,
@@ -260,7 +246,6 @@
       "avg_execution_time_ms": 80.372,
       "tool_breakdown": {
         "track_usage": 3,
-        "smart_feedback_collector": 1,
         "get_prompt_template": 1
       },
       "hourly_distribution": {
@@ -327,26 +312,25 @@
       }
     },
     "2025-06-16": {
-      "total_calls": 6,
-      "successful_calls": 6,
+      "total_calls": 8,
+      "successful_calls": 8,
       "failed_calls": 0,
-      "total_execution_time_ms": 38.55,
-      "avg_execution_time_ms": 6.425,
+      "total_execution_time_ms": 51.699999999999996,
+      "avg_execution_time_ms": 6.4624999999999995,
       "tool_breakdown": {
-        "get_prompt_template": 4,
-        "track_usage": 1,
-        "smart_feedback_collector": 1
+        "get_prompt_template": 5,
+        "track_usage": 2
       },
       "hourly_distribution": {
         "0": 0,
-        "1": 6,
+        "1": 7,
         "2": 0,
         "3": 0,
         "4": 0,
         "5": 0,
         "6": 0,
         "7": 0,
-        "8": 0,
+        "8": 1,
         "9": 0,
         "10": 0,
         "11": 0,
@@ -366,35 +350,17 @@
     }
   },
   "tool_stats": {
-    "smart_feedback_collector": {
-      "total_calls": 3,
-      "successful_calls": 3,
-      "failed_calls": 0,
-      "first_used": "2025-06-13T17:30:36.812306",
-      "last_used": "2025-06-16T01:52:19.067658",
-      "avg_execution_time_ms": 11.719999999999999,
-      "total_execution_time_ms": 35.16,
-      "common_arguments": {
-        "task_summary": {
-          "开发分销规则页面，包含列表展示、搜索、新增、编辑、删除功能，使用Element Plus组件构建用户": 1,
-          "用户非常愤怒地指出我在分销商管理页面中的表格列定义都对不上，需要立即修复所有字段不匹配的问题": 1,
-          "制定了MCP项目的分批次代码提交计划，按功能模块分为8个批次，包含依赖更新、API模块、Git集成、": 1
-        }
-      },
-      "error_patterns": []
-    },
     "track_usage": {
-      "total_calls": 5,
-      "successful_calls": 5,
+      "total_calls": 6,
+      "successful_calls": 6,
       "failed_calls": 0,
       "first_used": "2025-06-14T15:54:14.555876",
-      "last_used": "2025-06-16T01:41:23.705987",
-      "avg_execution_time_ms": 75.982,
-      "total_execution_time_ms": 379.91,
+      "last_used": "2025-06-16T01:54:17.672043",
+      "avg_execution_time_ms": 64.38666666666667,
+      "total_execution_time_ms": 386.32000000000005,
       "common_arguments": {
         "tool_name": {
           "登录页面迁移": 1,
-          "smart_feedback_collector": 1,
           "代码修复调试": 1,
           "环境变量配置修复": 1,
           "get_prompt_template": 1
@@ -407,7 +373,7 @@
           "用户获取组件复用提示词模板": 1
         },
         "user_feedback": {
-          "excellent": 3,
+          "excellent": 4,
           "poor": 1,
           "good": 1
         }
@@ -415,23 +381,24 @@
       "error_patterns": []
     },
     "get_prompt_template": {
-      "total_calls": 5,
-      "successful_calls": 5,
+      "total_calls": 6,
+      "successful_calls": 6,
       "failed_calls": 0,
       "first_used": "2025-06-14T23:48:35.488048",
-      "last_used": "2025-06-16T01:51:36.963975",
-      "avg_execution_time_ms": 8.914,
-      "total_execution_time_ms": 44.57,
+      "last_used": "2025-06-16T08:55:33.354079",
+      "avg_execution_time_ms": 8.551666666666668,
+      "total_execution_time_ms": 51.31,
       "common_arguments": {
         "prompt_type": {
-          "git_commit": 4,
+          "git_commit": 5,
           "component_reuse": 1
         },
         "context": {
           "修复了pnpm run preview预览白屏问题，主要解决了路由无限重定向循环问题，修复了auth": 1,
           "前端项目代码提交": 1,
           "用户需要生成组件的提示词": 1,
-          "MCP项目代码提交，包含分析API、前端开发助手、使用追踪等功能模块的修改和新增": 1
+          "MCP项目代码提交，包含分析API、前端开发助手、使用追踪等功能模块的修改和新增": 1,
+          "移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和相关配置": 1
         }
       },
       "error_patterns": []
