@@ -951,7 +951,7 @@ const emit = defineEmits<{
         component_type: Optional[str] = None,
         search_keywords: List[str] = None
     ) -> str:
-        """在项目中查找可复用的组件"""
+        """在项目中查找可复用的组件 - 使用智能语义匹配"""
         
         try:
             project_dir = Path(project_path)
@@ -971,13 +971,15 @@ const emit = defineEmits<{
                 if component_info:
                     components_info.append(component_info)
             
-            # 根据类型和关键词过滤
-            filtered_components = self._filter_components(
+            # 使用智能匹配算法
+            filtered_components = self._intelligent_component_filter(
                 components_info, component_type, search_keywords
             )
             
             if not filtered_components:
-                return f"未找到匹配的{component_type or ''}组件"
+                # 提供搜索建议
+                suggestions = self._generate_search_suggestions(components_info, search_keywords)
+                return f"未找到匹配的组件。{suggestions}"
             
             # 生成结果报告
             return self._generate_component_report(filtered_components)
@@ -1023,16 +1025,25 @@ const emit = defineEmits<{
             component_name = self._extract_component_name(file_path)
             
             # 提取组件信息
+            props = self._extract_props(content)
+            events = self._extract_events(content)
+            slots = self._extract_slots(content)
+            description = self._extract_description(content)
+            
+            # 分析组件功能特性
+            functional_type = self._analyze_component_functionality(content, props, events, component_name, file_path)
+            
             component_info = {
                 "name": component_name,
                 "path": str(file_path),
-                "props": self._extract_props(content),
-                "events": self._extract_events(content),
-                "slots": self._extract_slots(content),
-                "description": self._extract_description(content),
-                "type": self._guess_component_type(component_name, content, file_path),
+                "props": props,
+                "events": events,
+                "slots": slots,
+                "description": description,
+                "type": functional_type,
                 "is_wrapper": self._is_wrapper_component(content, file_path),
-                "dependency_type": self._get_dependency_type(file_path)
+                "dependency_type": self._get_dependency_type(file_path),
+                "features": self._extract_component_features(content, props, events)
             }
             
             return component_info
@@ -1154,6 +1165,98 @@ const emit = defineEmits<{
         
         return ""
     
+    def _analyze_component_functionality(self, content: str, props: List[Dict], events: List[str], name: str, file_path: Path) -> str:
+        """通过内容、props和events分析组件功能类型"""
+        content_lower = content.lower()
+        name_lower = name.lower()
+        path_lower = str(file_path).lower()
+        
+        # 分析props来判断组件功能
+        prop_names = [prop.get('name', '').lower() for prop in props]
+        prop_text = ' '.join(prop_names)
+        
+        # 分析events来判断组件功能
+        event_text = ' '.join(events).lower()
+        
+        # 合并所有分析文本
+        all_analysis_text = f"{content_lower} {name_lower} {path_lower} {prop_text} {event_text}"
+        
+        # 选择类组件特征检测（更精确）
+        checkbox_indicators = [
+            'checked', 'ischecked', 'value', 'modelvalue', 'selected', 'isradio',
+            'change', 'input', 'update:modelvalue', 'checkbox', 'radio'
+        ]
+        
+        form_indicators = [
+            'form', 'validate', 'rules', 'label', 'required', 'placeholder'
+        ]
+        
+        table_indicators = [
+            'columns', 'data', 'rows', 'pagination', 'sort', 'filter'
+        ]
+        
+        modal_indicators = [
+            'visible', 'open', 'show', 'close', 'cancel', 'confirm'
+        ]
+        
+        # 检查选择类组件特征
+        checkbox_score = sum(1 for indicator in checkbox_indicators if indicator in all_analysis_text)
+        form_score = sum(1 for indicator in form_indicators if indicator in all_analysis_text)
+        table_score = sum(1 for indicator in table_indicators if indicator in all_analysis_text)
+        modal_score = sum(1 for indicator in modal_indicators if indicator in all_analysis_text)
+        
+        # 特殊检查：如果组件名包含radio/check/select相关词汇
+        if any(word in name_lower for word in ['radio', 'check', 'select', 'option', 'choose']):
+            checkbox_score += 2
+        
+        # 特殊检查：如果组件支持单选/多选模式
+        if any(prop.get('name', '').lower() in ['isradio', 'multiple', 'mode'] for prop in props):
+            checkbox_score += 1
+        
+        # 根据得分判断组件类型
+        scores = {
+            'checkbox': checkbox_score,
+            'form': form_score,
+            'table': table_score,
+            'modal': modal_score
+        }
+        
+        # 选择得分最高的类型
+        max_score = max(scores.values())
+        if max_score >= 2:  # 至少要有2个特征匹配
+            for comp_type, score in scores.items():
+                if score == max_score:
+                    return comp_type
+        
+        # 回退到原始的猜测逻辑
+        return self._guess_component_type(name, content, file_path)
+    
+    def _extract_component_features(self, content: str, props: List[Dict], events: List[str]) -> List[str]:
+        """提取组件功能特性"""
+        features = []
+        content_lower = content.lower()
+        
+        # 检查常见功能特性
+        if any(prop.get('name', '').lower() in ['disabled', 'readonly'] for prop in props):
+            features.append('禁用状态')
+        
+        if any(prop.get('name', '').lower() in ['size', 'large', 'small'] for prop in props):
+            features.append('多尺寸')
+            
+        if any(prop.get('name', '').lower() in ['loading', 'pending'] for prop in props):
+            features.append('加载状态')
+            
+        if any(event in ['change', 'input', 'update:modelValue'] for event in events):
+            features.append('双向绑定')
+            
+        if 'v-model' in content_lower:
+            features.append('响应式数据')
+            
+        if any(prop.get('name', '').lower() in ['options', 'items', 'data'] for prop in props):
+            features.append('数据驱动')
+        
+        return features
+    
     def _guess_component_type(self, name: str, content: str, file_path: Path) -> str:
         """根据组件名称、内容和路径猜测组件类型"""
         name_lower = name.lower()
@@ -1166,11 +1269,22 @@ const emit = defineEmits<{
         form_keywords = ['form', 'input', 'edit', 'create', '表单', '编辑', '新增']
         card_keywords = ['card', 'panel', 'box', '卡片', '面板']
         tag_keywords = ['tag', 'badge', 'label', 'chip', '标签', '徽章']
+        # 新增选择类组件关键词
+        checkbox_keywords = ['checkbox', 'radio', 'check', 'select', 'option', 'choose', 'toggle', 'switch', '选择', '勾选', '单选', '多选', '复选']
         
         # 检查名称、内容和路径
         all_text = f"{name_lower} {content_lower} {path_lower}"
         
-        if any(keyword in all_text for keyword in tag_keywords):
+        # 优先检查选择类组件
+        if any(keyword in all_text for keyword in checkbox_keywords):
+            # 进一步判断具体类型
+            if any(word in all_text for word in ['radio', '单选']):
+                return 'radio'
+            elif any(word in all_text for word in ['checkbox', 'check', '复选', '多选']):
+                return 'checkbox'
+            else:
+                return 'select'  # 通用选择组件
+        elif any(keyword in all_text for keyword in tag_keywords):
             return 'tag'
         elif any(keyword in all_text for keyword in modal_keywords):
             return 'modal'
@@ -1186,59 +1300,276 @@ const emit = defineEmits<{
             return 'table'
         elif any(keyword in content_lower for keyword in ['<el-form', '<a-form', 'form-item']):
             return 'form'
+        # 检查选择类UI组件
+        elif any(keyword in content_lower for keyword in ['<el-checkbox', '<a-checkbox', '<el-radio', '<a-radio', 'v-model:checked']):
+            return 'checkbox'
         else:
             return 'custom'
     
-    def _filter_components(
+    def _intelligent_component_filter(
         self, 
         components: List[Dict], 
         component_type: Optional[str],
         keywords: Optional[List[str]]
     ) -> List[Dict]:
-        """根据类型和关键词过滤组件"""
-        filtered = components
+        """智能组件过滤 - 使用语义匹配和功能分析"""
         
-        # 按类型过滤
-        if component_type:
-            filtered = [c for c in filtered if c['type'] == component_type]
+        if not keywords and not component_type:
+            return components
         
-        # 按关键词过滤（更灵活的匹配）
+        scored_components = []
+        
+        for component in components:
+            score = self._calculate_component_similarity(component, component_type, keywords)
+            if score > 0:
+                scored_components.append((component, score))
+        
+        # 按相似度排序
+        scored_components.sort(key=lambda x: x[1], reverse=True)
+        
+        # 返回相似度大于阈值的组件
+        threshold = 0.3  # 可调整的相似度阈值
+        return [comp for comp, score in scored_components if score >= threshold]
+    
+    def _calculate_component_similarity(
+        self, 
+        component: Dict, 
+        target_type: Optional[str], 
+        keywords: Optional[List[str]]
+    ) -> float:
+        """计算组件与搜索条件的相似度"""
+        
+        total_score = 0.0
+        max_possible_score = 0.0
+        
+        # 构建组件的全文本描述
+        component_text = self._build_component_full_text(component)
+        
+        # 1. 组件类型匹配 (权重: 0.4)
+        if target_type:
+            type_score = self._calculate_type_similarity(component, target_type)
+            total_score += type_score * 0.4
+            max_possible_score += 0.4
+        
+        # 2. 关键词匹配 (权重: 0.3)
         if keywords:
-            filtered_by_keywords = []
-            for component in filtered:
-                # 扩展搜索范围，包含更多信息
-                search_text = f"{component['name']} {component['description']} {component['path']}"
-                
-                # 添加props名称到搜索文本
-                props_text = " ".join([prop.get('name', '') for prop in component.get('props', [])])
-                events_text = " ".join(component.get('events', []))
-                slots_text = " ".join(component.get('slots', []))
-                
-                # 合并所有可搜索文本
-                full_search_text = f"{search_text} {props_text} {events_text} {slots_text}".lower()
-                
-                for keyword in keywords:
-                    keyword_lower = keyword.lower()
-                    # 支持部分匹配和模糊匹配
-                    if keyword_lower in full_search_text:
-                        filtered_by_keywords.append(component)
+            keyword_score = self._calculate_keyword_similarity(component_text, keywords)
+            total_score += keyword_score * 0.3
+            max_possible_score += 0.3
+        
+        # 3. 功能相似度 (权重: 0.2)
+        if keywords:
+            function_score = self._calculate_function_similarity(component, keywords)
+            total_score += function_score * 0.2
+            max_possible_score += 0.2
+        
+        # 4. 名称相似度 (权重: 0.1)
+        if keywords:
+            name_score = self._calculate_name_similarity(component['name'], keywords)
+            total_score += name_score * 0.1
+            max_possible_score += 0.1
+        
+        return total_score / max_possible_score if max_possible_score > 0 else 0.0
+    
+    def _build_component_full_text(self, component: Dict) -> str:
+        """构建组件的完整文本描述"""
+        texts = [
+            component.get('name', ''),
+            component.get('description', ''),
+            component.get('path', ''),
+            ' '.join([prop.get('name', '') for prop in component.get('props', [])]),
+            ' '.join(component.get('events', [])),
+            ' '.join(component.get('slots', [])),
+            ' '.join(component.get('features', []))
+        ]
+        return ' '.join(texts).lower()
+    
+    def _calculate_type_similarity(self, component: Dict, target_type: str) -> float:
+        """计算类型相似度"""
+        comp_type = component.get('type', '')
+        
+        # 直接匹配
+        if comp_type == target_type:
+            return 1.0
+        
+        # 语义相似度映射
+        similarity_map = {
+            'checkbox': ['radio', 'select', 'toggle', 'switch'],
+            'radio': ['checkbox', 'select', 'option'],
+            'select': ['checkbox', 'radio', 'dropdown', 'picker'],
+            'form': ['input', 'field', 'control'],
+            'table': ['grid', 'list', 'dataview'],
+            'modal': ['dialog', 'popup', 'overlay'],
+            'button': ['link', 'action'],
+            'input': ['field', 'control', 'form']
+        }
+        
+        # 检查相似类型
+        related_types = similarity_map.get(target_type, [])
+        if comp_type in related_types:
+            return 0.7
+        
+        # 检查反向映射
+        for main_type, related in similarity_map.items():
+            if main_type == comp_type and target_type in related:
+                return 0.7
+        
+        return 0.0
+    
+    def _calculate_keyword_similarity(self, component_text: str, keywords: List[str]) -> float:
+        """计算关键词相似度"""
+        if not keywords:
+            return 0.0
+        
+        total_matches = 0
+        for keyword in keywords:
+            keyword_lower = keyword.lower()
+            
+            # 精确匹配
+            if keyword_lower in component_text:
+                total_matches += 1.0
+                continue
+            
+            # 模糊匹配 (编辑距离)
+            fuzzy_score = self._fuzzy_match(keyword_lower, component_text)
+            total_matches += fuzzy_score
+        
+        return min(total_matches / len(keywords), 1.0)
+    
+    def _calculate_function_similarity(self, component: Dict, keywords: List[str]) -> float:
+        """基于功能分析计算相似度"""
+        if not keywords:
+            return 0.0
+        
+        # 功能意图映射
+        intent_map = {
+            'checkbox': ['选择', '勾选', '多选', '选中', '确认'],
+            'radio': ['单选', '选择', '切换'],
+            'select': ['选择', '下拉', '筛选', '挑选'],
+            'input': ['输入', '填写', '录入'],
+            'upload': ['上传', '选择文件', '导入'],
+            'date': ['日期', '时间', '选择日期'],
+            'search': ['搜索', '查找', '筛选']
+        }
+        
+        score = 0.0
+        for keyword in keywords:
+            keyword_lower = keyword.lower()
+            for intent, descriptions in intent_map.items():
+                if any(desc in keyword_lower for desc in descriptions):
+                    # 检查组件是否支持这种功能
+                    if self._component_supports_intent(component, intent):
+                        score += 0.8
                         break
-            filtered = filtered_by_keywords
         
-        # 优先显示项目内组件，然后是二次封装组件，最后是第三方组件
-        def sort_priority(comp):
-            if comp.get('dependency_type') == 'project':
-                return 0
-            elif comp.get('is_wrapper', False):
-                return 1
-            elif comp.get('dependency_type') == 'third_party':
-                return 2
-            else:
-                return 3
+        return min(score / len(keywords), 1.0) if keywords else 0.0
+    
+    def _component_supports_intent(self, component: Dict, intent: str) -> bool:
+        """检查组件是否支持特定功能意图"""
+        component_text = self._build_component_full_text(component)
         
-        filtered.sort(key=sort_priority)
+        intent_indicators = {
+            'checkbox': ['checked', 'value', 'modelvalue', 'selected', 'change'],
+            'radio': ['checked', 'value', 'modelvalue', 'isradio'],
+            'select': ['options', 'value', 'modelvalue', 'change'],
+            'input': ['value', 'modelvalue', 'placeholder', 'input'],
+            'upload': ['file', 'upload', 'accept', 'multiple'],
+            'date': ['date', 'time', 'picker', 'calendar'],
+            'search': ['search', 'filter', 'query']
+        }
         
-        return filtered
+        indicators = intent_indicators.get(intent, [])
+        return any(indicator in component_text for indicator in indicators)
+    
+    def _calculate_name_similarity(self, component_name: str, keywords: List[str]) -> float:
+        """计算名称相似度"""
+        if not keywords:
+            return 0.0
+        
+        name_lower = component_name.lower()
+        max_similarity = 0.0
+        
+        for keyword in keywords:
+            keyword_lower = keyword.lower()
+            
+            # 完全匹配
+            if keyword_lower == name_lower:
+                max_similarity = max(max_similarity, 1.0)
+                continue
+            
+            # 包含匹配
+            if keyword_lower in name_lower or name_lower in keyword_lower:
+                max_similarity = max(max_similarity, 0.8)
+                continue
+            
+            # 编辑距离相似度
+            similarity = self._string_similarity(keyword_lower, name_lower)
+            max_similarity = max(max_similarity, similarity)
+        
+        return max_similarity
+    
+    def _fuzzy_match(self, keyword: str, text: str) -> float:
+        """模糊匹配算法"""
+        # 简单的模糊匹配实现
+        words = text.split()
+        best_match = 0.0
+        
+        for word in words:
+            similarity = self._string_similarity(keyword, word)
+            best_match = max(best_match, similarity)
+        
+        return best_match
+    
+    def _string_similarity(self, s1: str, s2: str) -> float:
+        """计算字符串相似度 (基于编辑距离)"""
+        if not s1 or not s2:
+            return 0.0
+        
+        # 简化的相似度算法
+        max_len = max(len(s1), len(s2))
+        if max_len == 0:
+            return 1.0
+        
+        # 计算公共子序列长度
+        common = 0
+        for i, char in enumerate(s1):
+            if i < len(s2) and char == s2[i]:
+                common += 1
+        
+        return common / max_len
+    
+    def _generate_search_suggestions(self, all_components: List[Dict], keywords: Optional[List[str]]) -> str:
+        """生成搜索建议"""
+        if not all_components:
+            return ""
+        
+        # 统计可用的组件类型
+        available_types = {}
+        for comp in all_components:
+            comp_type = comp.get('type', 'unknown')
+            available_types[comp_type] = available_types.get(comp_type, 0) + 1
+        
+        # 生成建议
+        suggestions = []
+        
+        if keywords:
+            # 基于关键词提供相似组件建议
+            similar_comps = []
+            for comp in all_components[:5]:  # 只看前5个
+                name = comp.get('name', '')
+                if any(self._string_similarity(kw.lower(), name.lower()) > 0.3 for kw in keywords):
+                    similar_comps.append(name)
+            
+            if similar_comps:
+                suggestions.append(f"可能相关的组件：{', '.join(similar_comps)}")
+        
+        # 提供类型建议
+        popular_types = sorted(available_types.items(), key=lambda x: x[1], reverse=True)[:3]
+        if popular_types:
+            type_list = [f"{t[0]}({t[1]}个)" for t in popular_types]
+            suggestions.append(f"项目中主要组件类型：{', '.join(type_list)}")
+        
+        return " ".join(suggestions) if suggestions else "建议检查搜索关键词或组件类型。"
     
     def _generate_component_report(self, components: List[Dict]) -> str:
         """生成组件查找报告"""
@@ -1252,6 +1583,7 @@ const emit = defineEmits<{
             type_str = component['type']
             is_wrapper = component.get('is_wrapper', False)
             dep_type = component.get('dependency_type', 'unknown')
+            features = component.get('features', [])
             
             # 添加组件类型标识
             type_badge = f"**类型**: {type_str}"
@@ -1266,6 +1598,10 @@ const emit = defineEmits<{
             
             if component['description']:
                 report += f"**描述**: {component['description']}\n"
+            
+            # 显示功能特性
+            if features:
+                report += f"**功能特性**: {', '.join(features)}\n"
             
             if component['props']:
                 report += f"**Props**: \n"
