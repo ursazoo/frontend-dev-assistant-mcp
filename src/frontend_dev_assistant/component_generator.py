@@ -989,19 +989,27 @@ const emit = defineEmits<{
         """查找项目中的Vue组件文件"""
         component_files = []
         
-        # 常见的组件目录
+        # 扩展的组件目录搜索
         search_dirs = [
             "src/components",
-            "src/views",
+            "src/views", 
+            "src/pages",
             "components",
-            "views"
+            "views",
+            "pages",
+            "src",  # 直接搜索src目录
+            "."     # 搜索整个项目根目录
         ]
         
         for search_dir in search_dirs:
             component_dir = project_dir / search_dir
             if component_dir.exists():
                 # 递归查找.vue文件
-                component_files.extend(component_dir.rglob("*.vue"))
+                vue_files = list(component_dir.rglob("*.vue"))
+                component_files.extend(vue_files)
+        
+        # 去重
+        component_files = list(set(component_files))
         
         return component_files
     
@@ -1105,17 +1113,25 @@ const emit = defineEmits<{
         name_lower = name.lower()
         content_lower = content.lower()
         
-        if any(keyword in name_lower for keyword in ['table', 'grid', 'list']):
-            return 'table'
-        elif any(keyword in name_lower for keyword in ['form', 'input']):
-            return 'form'
-        elif any(keyword in name_lower for keyword in ['modal', 'dialog', 'popup']):
+        # 扩展的组件类型识别
+        modal_keywords = ['modal', 'dialog', 'popup', 'drawer', '弹窗', '对话框', 'fb', 'overlay']
+        table_keywords = ['table', 'grid', 'list', 'datagrid', '表格', '列表']
+        form_keywords = ['form', 'input', 'edit', 'create', '表单', '编辑', '新增']
+        card_keywords = ['card', 'panel', 'box', '卡片', '面板']
+        
+        if any(keyword in name_lower for keyword in modal_keywords):
             return 'modal'
-        elif any(keyword in name_lower for keyword in ['card', 'panel']):
-            return 'card'
-        elif any(keyword in content_lower for keyword in ['<table', 'pagination']):
+        elif any(keyword in name_lower for keyword in table_keywords):
             return 'table'
-        elif any(keyword in content_lower for keyword in ['<form', 'input', 'submit']):
+        elif any(keyword in name_lower for keyword in form_keywords):
+            return 'form'
+        elif any(keyword in name_lower for keyword in card_keywords):
+            return 'card'
+        elif any(keyword in content_lower for keyword in ['<el-dialog', '<a-modal', 'v-model:visible', 'v-model:open']):
+            return 'modal'
+        elif any(keyword in content_lower for keyword in ['<el-table', '<a-table', 'pagination']):
+            return 'table'
+        elif any(keyword in content_lower for keyword in ['<el-form', '<a-form', 'form-item']):
             return 'form'
         else:
             return 'custom'
@@ -1133,13 +1149,19 @@ const emit = defineEmits<{
         if component_type:
             filtered = [c for c in filtered if c['type'] == component_type]
         
-        # 按关键词过滤
+        # 按关键词过滤（更灵活的匹配）
         if keywords:
             filtered_by_keywords = []
             for component in filtered:
+                component_text = f"{component['name']} {component['description']} {component['path']}".lower()
+                
                 for keyword in keywords:
-                    if (keyword.lower() in component['name'].lower() or
-                        keyword.lower() in component['description'].lower()):
+                    keyword_lower = keyword.lower()
+                    # 支持部分匹配和模糊匹配
+                    if (keyword_lower in component_text or
+                        any(keyword_lower in prop.get('name', '').lower() for prop in component.get('props', [])) or
+                        any(keyword_lower in event.lower() for event in component.get('events', [])) or
+                        any(keyword_lower in slot.lower() for slot in component.get('slots', []))):
                         filtered_by_keywords.append(component)
                         break
             filtered = filtered_by_keywords
