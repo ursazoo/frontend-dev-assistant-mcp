@@ -994,7 +994,7 @@ const emit = defineEmits<{
         # 扩展的组件目录搜索
         search_dirs = [
             "src/components",
-            "src/views",
+            "src/views", 
             "src/pages",
             "components",
             "views",
@@ -1003,15 +1003,24 @@ const emit = defineEmits<{
             "."     # 搜索整个项目根目录
         ]
         
+        # 支持更多文件类型
+        file_patterns = ["*.vue", "*.jsx", "*.tsx", "*.js", "*.ts"]
+        
         for search_dir in search_dirs:
             component_dir = project_dir / search_dir
             if component_dir.exists():
-                # 递归查找.vue文件
-                vue_files = list(component_dir.rglob("*.vue"))
-                component_files.extend(vue_files)
+                # 递归查找多种组件文件
+                for pattern in file_patterns:
+                    files = list(component_dir.rglob(pattern))
+                    component_files.extend(files)
         
         # 去重
         component_files = list(set(component_files))
+        
+        # 输出调试信息
+        print(f"🔍 在 {project_dir} 中找到 {len(component_files)} 个组件文件")
+        for file in component_files[:5]:  # 只显示前5个作为示例
+            print(f"  - {file}")
         
         return component_files
     
@@ -1055,13 +1064,17 @@ const emit = defineEmits<{
     def _extract_component_name(self, file_path: Path) -> str:
         """提取组件名称 - 优先使用目录名"""
         # 如果文件名是 index.vue，使用父目录名
-        if file_path.name == 'index.vue':
+        if file_path.name == 'index.vue' or file_path.name == 'index.js' or file_path.name == 'index.tsx':
             parent_dir = file_path.parent.name
             # 转换为 PascalCase
             return ''.join(word.capitalize() for word in parent_dir.replace('-', '_').split('_'))
         else:
             # 使用文件名（去掉扩展名）
-            return file_path.stem
+            name = file_path.stem
+            # 处理常见的组件命名模式
+            if name.lower().endswith('component'):
+                name = name[:-9]  # 移除 'component' 后缀
+            return name
 
     def _is_wrapper_component(self, content: str, file_path: Path) -> bool:
         """判断是否为二次封装组件"""
@@ -1181,7 +1194,12 @@ const emit = defineEmits<{
         # 合并所有分析文本
         all_analysis_text = f"{content_lower} {name_lower} {path_lower} {prop_text} {event_text}"
         
-        # 选择类组件特征检测（更精确）
+        # 增强的组件特征检测
+        button_indicators = [
+            'click', 'onclick', 'button', 'btn', 'common', 'base', 'action',
+            'submit', 'confirm', 'cancel', 'type', 'size', 'loading', 'disabled'
+        ]
+        
         checkbox_indicators = [
             'checked', 'ischecked', 'value', 'modelvalue', 'selected', 'isradio',
             'change', 'input', 'update:modelvalue', 'checkbox', 'radio'
@@ -1199,22 +1217,28 @@ const emit = defineEmits<{
             'visible', 'open', 'show', 'close', 'cancel', 'confirm'
         ]
         
-        # 检查选择类组件特征
+        # 检查各类组件特征
+        button_score = sum(1 for indicator in button_indicators if indicator in all_analysis_text)
         checkbox_score = sum(1 for indicator in checkbox_indicators if indicator in all_analysis_text)
         form_score = sum(1 for indicator in form_indicators if indicator in all_analysis_text)
         table_score = sum(1 for indicator in table_indicators if indicator in all_analysis_text)
         modal_score = sum(1 for indicator in modal_indicators if indicator in all_analysis_text)
         
-        # 特殊检查：如果组件名包含radio/check/select相关词汇
+        # 特殊检查：如果组件名包含特定词汇，加权
+        if any(word in name_lower for word in ['button', 'btn', 'common']):
+            button_score += 3
         if any(word in name_lower for word in ['radio', 'check', 'select', 'option', 'choose']):
             checkbox_score += 2
         
-        # 特殊检查：如果组件支持单选/多选模式
+        # 特殊检查：如果组件支持特定模式
         if any(prop.get('name', '').lower() in ['isradio', 'multiple', 'mode'] for prop in props):
             checkbox_score += 1
+        if any(prop.get('name', '').lower() in ['type', 'size', 'loading'] for prop in props):
+            button_score += 1
         
         # 根据得分判断组件类型
         scores = {
+            'button': button_score,
             'checkbox': checkbox_score,
             'form': form_score,
             'table': table_score,
@@ -1327,9 +1351,19 @@ const emit = defineEmits<{
         # 按相似度排序
         scored_components.sort(key=lambda x: x[1], reverse=True)
         
-        # 返回相似度大于阈值的组件
-        threshold = 0.3  # 可调整的相似度阈值
-        return [comp for comp, score in scored_components if score >= threshold]
+        # 降低相似度阈值，特别是对button类组件
+        threshold = 0.15  # 从0.3降低到0.15
+        if keywords and any('button' in kw.lower() or 'btn' in kw.lower() for kw in keywords):
+            threshold = 0.1  # button组件更低阈值
+        
+        filtered = [comp for comp, score in scored_components if score >= threshold]
+        
+        # 如果没找到任何组件，进一步降低阈值重试
+        if not filtered and scored_components:
+            emergency_threshold = 0.05
+            filtered = [comp for comp, score in scored_components if score >= emergency_threshold]
+        
+        return filtered
     
     def _calculate_component_similarity(
         self, 
@@ -1400,7 +1434,7 @@ const emit = defineEmits<{
             'form': ['input', 'field', 'control'],
             'table': ['grid', 'list', 'dataview'],
             'modal': ['dialog', 'popup', 'overlay'],
-            'button': ['link', 'action'],
+            'button': ['btn', 'link', 'action', 'common', 'base'],
             'input': ['field', 'control', 'form']
         }
         
@@ -1413,6 +1447,15 @@ const emit = defineEmits<{
         for main_type, related in similarity_map.items():
             if main_type == comp_type and target_type in related:
                 return 0.7
+        
+        # 特殊处理：检查组件名称中是否包含目标类型的同义词
+        comp_name = component.get('name', '').lower()
+        comp_path = component.get('path', '').lower()
+        
+        if target_type == 'button':
+            button_indicators = ['button', 'btn', 'common', 'base', 'action', 'click']
+            if any(indicator in comp_name or indicator in comp_path for indicator in button_indicators):
+                return 0.6
         
         return 0.0
     
