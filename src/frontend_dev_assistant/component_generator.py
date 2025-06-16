@@ -992,7 +992,7 @@ const emit = defineEmits<{
         # 扩展的组件目录搜索
         search_dirs = [
             "src/components",
-            "src/views", 
+            "src/views",
             "src/pages",
             "components",
             "views",
@@ -1019,15 +1019,20 @@ const emit = defineEmits<{
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
             
+            # 优化组件名称提取 - 使用目录名而不是文件名
+            component_name = self._extract_component_name(file_path)
+            
             # 提取组件信息
             component_info = {
-                "name": file_path.stem,
+                "name": component_name,
                 "path": str(file_path),
                 "props": self._extract_props(content),
                 "events": self._extract_events(content),
                 "slots": self._extract_slots(content),
                 "description": self._extract_description(content),
-                "type": self._guess_component_type(file_path.stem, content)
+                "type": self._guess_component_type(component_name, content, file_path),
+                "is_wrapper": self._is_wrapper_component(content, file_path),
+                "dependency_type": self._get_dependency_type(file_path)
             }
             
             return component_info
@@ -1035,6 +1040,47 @@ const emit = defineEmits<{
         except Exception as e:
             print(f"分析组件文件失败 {file_path}: {e}")
             return None
+    
+    def _extract_component_name(self, file_path: Path) -> str:
+        """提取组件名称 - 优先使用目录名"""
+        # 如果文件名是 index.vue，使用父目录名
+        if file_path.name == 'index.vue':
+            parent_dir = file_path.parent.name
+            # 转换为 PascalCase
+            return ''.join(word.capitalize() for word in parent_dir.replace('-', '_').split('_'))
+        else:
+            # 使用文件名（去掉扩展名）
+            return file_path.stem
+
+    def _is_wrapper_component(self, content: str, file_path: Path) -> bool:
+        """判断是否为二次封装组件"""
+        content_lower = content.lower()
+        
+        # 检查是否引入了第三方UI库组件
+        ui_library_patterns = [
+            'el-', 'a-', 'van-', 'n-',  # Element, Ant Design, Vant, Naive UI
+            'from \'element', 'from \'antd', 'from \'vant',
+            'import.*element', 'import.*antd', 'import.*vant'
+        ]
+        
+        has_ui_import = any(pattern in content_lower for pattern in ui_library_patterns)
+        
+        # 检查目录结构是否表明是二次封装
+        path_str = str(file_path).lower()
+        wrapper_indicators = ['fb', 'fs', 'custom', 'base', 'my']
+        has_wrapper_prefix = any(indicator in path_str for indicator in wrapper_indicators)
+        
+        return has_ui_import or has_wrapper_prefix
+
+    def _get_dependency_type(self, file_path: Path) -> str:
+        """获取依赖类型"""
+        path_str = str(file_path)
+        if 'node_modules' in path_str:
+            return 'third_party'
+        elif any(prefix in path_str.lower() for prefix in ['src/components', 'components']):
+            return 'project'
+        else:
+            return 'view'
     
     def _extract_props(self, content: str) -> List[Dict]:
         """提取组件Props"""
@@ -1108,24 +1154,31 @@ const emit = defineEmits<{
         
         return ""
     
-    def _guess_component_type(self, name: str, content: str) -> str:
-        """根据组件名称和内容猜测组件类型"""
+    def _guess_component_type(self, name: str, content: str, file_path: Path) -> str:
+        """根据组件名称、内容和路径猜测组件类型"""
         name_lower = name.lower()
         content_lower = content.lower()
+        path_lower = str(file_path).lower()
         
-        # 扩展的组件类型识别
+        # 扩展的组件类型识别，包含路径信息
         modal_keywords = ['modal', 'dialog', 'popup', 'drawer', '弹窗', '对话框', 'fb', 'overlay']
         table_keywords = ['table', 'grid', 'list', 'datagrid', '表格', '列表']
         form_keywords = ['form', 'input', 'edit', 'create', '表单', '编辑', '新增']
         card_keywords = ['card', 'panel', 'box', '卡片', '面板']
+        tag_keywords = ['tag', 'badge', 'label', 'chip', '标签', '徽章']
         
-        if any(keyword in name_lower for keyword in modal_keywords):
+        # 检查名称、内容和路径
+        all_text = f"{name_lower} {content_lower} {path_lower}"
+        
+        if any(keyword in all_text for keyword in tag_keywords):
+            return 'tag'
+        elif any(keyword in all_text for keyword in modal_keywords):
             return 'modal'
-        elif any(keyword in name_lower for keyword in table_keywords):
+        elif any(keyword in all_text for keyword in table_keywords):
             return 'table'
-        elif any(keyword in name_lower for keyword in form_keywords):
+        elif any(keyword in all_text for keyword in form_keywords):
             return 'form'
-        elif any(keyword in name_lower for keyword in card_keywords):
+        elif any(keyword in all_text for keyword in card_keywords):
             return 'card'
         elif any(keyword in content_lower for keyword in ['<el-dialog', '<a-modal', 'v-model:visible', 'v-model:open']):
             return 'modal'
@@ -1153,18 +1206,37 @@ const emit = defineEmits<{
         if keywords:
             filtered_by_keywords = []
             for component in filtered:
-                component_text = f"{component['name']} {component['description']} {component['path']}".lower()
+                # 扩展搜索范围，包含更多信息
+                search_text = f"{component['name']} {component['description']} {component['path']}"
+                
+                # 添加props名称到搜索文本
+                props_text = " ".join([prop.get('name', '') for prop in component.get('props', [])])
+                events_text = " ".join(component.get('events', []))
+                slots_text = " ".join(component.get('slots', []))
+                
+                # 合并所有可搜索文本
+                full_search_text = f"{search_text} {props_text} {events_text} {slots_text}".lower()
                 
                 for keyword in keywords:
                     keyword_lower = keyword.lower()
                     # 支持部分匹配和模糊匹配
-                    if (keyword_lower in component_text or
-                        any(keyword_lower in prop.get('name', '').lower() for prop in component.get('props', [])) or
-                        any(keyword_lower in event.lower() for event in component.get('events', [])) or
-                        any(keyword_lower in slot.lower() for slot in component.get('slots', []))):
+                    if keyword_lower in full_search_text:
                         filtered_by_keywords.append(component)
                         break
             filtered = filtered_by_keywords
+        
+        # 优先显示项目内组件，然后是二次封装组件，最后是第三方组件
+        def sort_priority(comp):
+            if comp.get('dependency_type') == 'project':
+                return 0
+            elif comp.get('is_wrapper', False):
+                return 1
+            elif comp.get('dependency_type') == 'third_party':
+                return 2
+            else:
+                return 3
+        
+        filtered.sort(key=sort_priority)
         
         return filtered
     
@@ -1176,8 +1248,20 @@ const emit = defineEmits<{
         report = f"## 🔍 找到 {len(components)} 个可复用组件\n\n"
         
         for i, component in enumerate(components, 1):
-            report += f"### {i}. {component['name']}\n\n"
-            report += f"**类型**: {component['type']}\n"
+            name = component['name']
+            type_str = component['type']
+            is_wrapper = component.get('is_wrapper', False)
+            dep_type = component.get('dependency_type', 'unknown')
+            
+            # 添加组件类型标识
+            type_badge = f"**类型**: {type_str}"
+            if is_wrapper:
+                type_badge += " (二次封装)"
+            if dep_type == 'third_party':
+                type_badge += " (第三方)"
+            
+            report += f"### {i}. {name}\n\n"
+            report += f"{type_badge}\n"
             report += f"**路径**: `{component['path']}`\n"
             
             if component['description']:
@@ -1197,14 +1281,14 @@ const emit = defineEmits<{
             
             # 生成使用示例
             report += f"\n**使用示例**:\n```vue\n"
-            report += f"<template>\n  <{self._to_kebab_case(component['name'])}"
+            report += f"<template>\n  <{self._to_kebab_case(name)}"
             
             if component['props']:
                 report += f"\n    {self._generate_props_example(component['props'])}"
             
             report += f"\n  />\n</template>\n\n"
             report += f"<script setup>\n"
-            report += f"import {component['name']} from '{component['path']}'\n"
+            report += f"import {name} from '{component['path']}'\n"
             report += f"</script>\n```\n\n"
             
             report += "---\n\n"
