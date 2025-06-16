@@ -49,18 +49,19 @@
       }
     },
     "2025-06-16": {
-      "total_calls": 8,
+      "total_calls": 13,
       "tool_breakdown": {
-        "get_prompt_template": 5,
-        "track_usage": 2
+        "get_prompt_template": 6,
+        "track_usage": 4,
+        "find_reusable_components": 2
       }
     }
   },
   "tool_usage": {
     "get_prompt_template": {
-      "total_uses": 10,
+      "total_uses": 11,
       "first_used": "2025-06-02T22:47:45.242844",
-      "last_used": "2025-06-16T08:55:33.352452",
+      "last_used": "2025-06-16T09:18:46.757157",
       "feedback_scores": [
         5,
         5,
@@ -91,11 +92,22 @@
       "contexts": []
     },
     "track_usage": {
-      "total_uses": 10,
+      "total_uses": 12,
       "first_used": "2025-06-04T11:32:35.858264",
-      "last_used": "2025-06-16T01:54:17.670805",
+      "last_used": "2025-06-16T09:10:45.239332",
       "feedback_scores": [],
       "contexts": []
+    },
+    "find_reusable_components": {
+      "total_uses": 2,
+      "first_used": "2025-06-16T09:09:58.755889",
+      "last_used": "2025-06-16T09:15:47.230564",
+      "feedback_scores": [
+        4
+      ],
+      "contexts": [
+        "用户查找项目中可复用的modal组件"
+      ]
     }
   },
   "user_feedback": [
@@ -297,6 +309,24 @@
       "timestamp": "2025-06-16T02:03:54.515628",
       "user_id": "rabbitsbear",
       "enhanced_usage_id": "8b5ce7fc-7e42-46e0-ab26-e34a3d849374"
+    },
+    {
+      "id": "0543187f-480a-4a26-bd5d-61a4159f44cf",
+      "tool_name": "code_refactoring",
+      "feedback": "excellent",
+      "context": "成功移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和数据清理，完成4个批次的规范化提交",
+      "timestamp": "2025-06-16T08:57:02.555700",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "072f8bb3-74fb-42c0-962f-96b7141800a6"
+    },
+    {
+      "id": "e75c5608-6370-42a9-a486-e23e6346ef95",
+      "tool_name": "find_reusable_components",
+      "feedback": "good",
+      "context": "用户查找项目中可复用的modal组件",
+      "timestamp": "2025-06-16T09:10:45.237145",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "66a896d7-a482-454c-96a6-dc822ac63dd5"
     }
   ],
   "usage_logs": [
@@ -642,6 +672,77 @@
       "arguments": {
         "prompt_type": "git_commit",
         "context": "移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和相关配置，简化MCP项目结构"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "8d6809e1-7c25-4b55-80e5-3d17ab5f7a7c",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T08:57:02.557777",
+      "date": "2025-06-16",
+      "arguments": {
+        "tool_name": "code_refactoring",
+        "usage_context": "成功移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和数据清理，完成4个批次的规范化提交",
+        "user_feedback": "excellent"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "ab35151d-5c01-4d95-98f2-ccfbb406b5e7",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:09:58.755889",
+      "date": "2025-06-16",
+      "arguments": {
+        "project_path": "/Users/rabbitsbear/project/fshows/fs-codeOrder-web-project",
+        "component_type": "modal",
+        "search_keywords": [
+          "modal",
+          "dialog",
+          "popup",
+          "弹窗",
+          "对话框"
+        ]
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "1dc797c7-c4b1-4576-b874-57ceda2ab57a",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T09:10:45.239332",
+      "date": "2025-06-16",
+      "arguments": {
+        "tool_name": "find_reusable_components",
+        "usage_context": "用户查找项目中可复用的modal组件",
+        "user_feedback": "good"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "4818e03e-6e23-435e-af9d-92adff9f6ff3",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:15:47.230564",
+      "date": "2025-06-16",
+      "arguments": {
+        "project_path": "/Users/rabbitsbear/project/fshows/fs-codeOrg",
+        "component_type": "modal",
+        "search_keywords": [
+          "modal",
+          "dialog",
+          "popup",
+          "弹窗",
+          "对话框"
+        ]
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "3cb09e53-fcc7-4923-9248-79add72b9d60",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T09:18:46.757157",
+      "date": "2025-06-16",
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "改进了MCP frontend-dev-assistant的find_reusable_components功能，解决了组件查找不准确的问题"
       },
       "user_id": "rabbitsbear"
     }
@@ -1006,6 +1107,54 @@
         "productivity_score": 0.5,
         "efficiency_rating": "优秀"
       }
+    },
+    {
+      "id": "072f8bb3-74fb-42c0-962f-96b7141800a6",
+      "tool_name": "code_refactoring",
+      "timestamp": "2025-06-16T08:57:02.555700",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "成功移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和数据清理，完成4个批次的规范化提交",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
+    },
+    {
+      "id": "66a896d7-a482-454c-96a6-dc822ac63dd5",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:10:45.237145",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "用户查找项目中可复用的modal组件",
+      "user_feedback": "good",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
     }
   ],
   "daily_ai_stats": {
@@ -1048,19 +1197,21 @@
       }
     },
     "2025-06-16": {
-      "total_sessions": 6,
+      "total_sessions": 8,
       "total_lines_generated": 275,
       "total_files_modified": 10,
-      "avg_ai_probability": 0.417,
-      "avg_quality_score": 52.5,
-      "avg_productivity": 0.512,
+      "avg_ai_probability": 0.312,
+      "avg_quality_score": 39.375,
+      "avg_productivity": 0.384,
       "tool_breakdown": {
         "get_prompt_template": 1,
         "git_commit_assistant": 1,
         "cursor_component_generation": 1,
         "ai_code_refactor": 1,
         "miniprogram_page_gen": 1,
-        "typescript_types_gen": 1
+        "typescript_types_gen": 1,
+        "code_refactoring": 1,
+        "find_reusable_components": 1
       }
     }
   }

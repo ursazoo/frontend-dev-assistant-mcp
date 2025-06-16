@@ -201,6 +201,102 @@
       "error_message": null,
       "result_size_bytes": 833,
       "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750035422558_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T08:57:02.558929",
+      "date": "2025-06-16",
+      "hour": 8,
+      "arguments": {
+        "tool_name": "code_refactoring",
+        "usage_context": "成功移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和数据清理，完成4个批次的规范化提交",
+        "user_feedback": "excellent"
+      },
+      "execution_time_ms": 5.2,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 63,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750036198757_find_reusable_components",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:09:58.757878",
+      "date": "2025-06-16",
+      "hour": 9,
+      "arguments": {
+        "project_path": "/Users/rabbitsbear/project/fshows/fs-codeOrder-web-project",
+        "component_type": "modal",
+        "search_keywords": [
+          "modal",
+          "dialog",
+          "popup",
+          "弹窗",
+          "对话框"
+        ]
+      },
+      "execution_time_ms": 86.49,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 29,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750036245240_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T09:10:45.240959",
+      "date": "2025-06-16",
+      "hour": 9,
+      "arguments": {
+        "tool_name": "find_reusable_components",
+        "usage_context": "用户查找项目中可复用的modal组件",
+        "user_feedback": "good"
+      },
+      "execution_time_ms": 5.84,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 66,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750036547232_find_reusable_components",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:15:47.232852",
+      "date": "2025-06-16",
+      "hour": 9,
+      "arguments": {
+        "project_path": "/Users/rabbitsbear/project/fshows/fs-codeOrg",
+        "component_type": "modal",
+        "search_keywords": [
+          "modal",
+          "dialog",
+          "popup",
+          "弹窗",
+          "对话框"
+        ]
+      },
+      "execution_time_ms": 7.44,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 68,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750036726758_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T09:18:46.758770",
+      "date": "2025-06-16",
+      "hour": 9,
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "改进了MCP frontend-dev-assistant的find_reusable_components功能，解决了组件查找不准确的问题"
+      },
+      "execution_time_ms": 3.9,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 818,
+      "user_agent": "cursor-mcp"
     }
   ],
   "daily_stats": {
@@ -312,14 +408,15 @@
       }
     },
     "2025-06-16": {
-      "total_calls": 8,
-      "successful_calls": 8,
+      "total_calls": 13,
+      "successful_calls": 13,
       "failed_calls": 0,
-      "total_execution_time_ms": 51.699999999999996,
-      "avg_execution_time_ms": 6.4624999999999995,
+      "total_execution_time_ms": 160.57,
+      "avg_execution_time_ms": 12.35153846153846,
       "tool_breakdown": {
-        "get_prompt_template": 5,
-        "track_usage": 2
+        "get_prompt_template": 6,
+        "track_usage": 4,
+        "find_reusable_components": 2
       },
       "hourly_distribution": {
         "0": 0,
@@ -330,8 +427,8 @@
         "5": 0,
         "6": 0,
         "7": 0,
-        "8": 1,
-        "9": 0,
+        "8": 2,
+        "9": 4,
         "10": 0,
         "11": 0,
         "12": 0,
@@ -351,19 +448,20 @@
   },
   "tool_stats": {
     "track_usage": {
-      "total_calls": 6,
-      "successful_calls": 6,
+      "total_calls": 8,
+      "successful_calls": 8,
       "failed_calls": 0,
       "first_used": "2025-06-14T15:54:14.555876",
-      "last_used": "2025-06-16T01:54:17.672043",
-      "avg_execution_time_ms": 64.38666666666667,
-      "total_execution_time_ms": 386.32000000000005,
+      "last_used": "2025-06-16T09:10:45.240959",
+      "avg_execution_time_ms": 49.67,
+      "total_execution_time_ms": 397.36,
       "common_arguments": {
         "tool_name": {
           "登录页面迁移": 1,
           "代码修复调试": 1,
           "环境变量配置修复": 1,
-          "get_prompt_template": 1
+          "get_prompt_template": 1,
+          "code_refactoring": 1
         },
         "usage_context": {
           "将driver-coach-admin-element项目的登录页面迁移到element-plus-": 1,
@@ -373,24 +471,24 @@
           "用户获取组件复用提示词模板": 1
         },
         "user_feedback": {
-          "excellent": 4,
+          "excellent": 5,
           "poor": 1,
-          "good": 1
+          "good": 2
         }
       },
       "error_patterns": []
     },
     "get_prompt_template": {
-      "total_calls": 6,
-      "successful_calls": 6,
+      "total_calls": 7,
+      "successful_calls": 7,
       "failed_calls": 0,
       "first_used": "2025-06-14T23:48:35.488048",
-      "last_used": "2025-06-16T08:55:33.354079",
-      "avg_execution_time_ms": 8.551666666666668,
-      "total_execution_time_ms": 51.31,
+      "last_used": "2025-06-16T09:18:46.758770",
+      "avg_execution_time_ms": 7.887142857142857,
+      "total_execution_time_ms": 55.21,
       "common_arguments": {
         "prompt_type": {
-          "git_commit": 5,
+          "git_commit": 6,
           "component_reuse": 1
         },
         "context": {
@@ -399,6 +497,28 @@
           "用户需要生成组件的提示词": 1,
           "MCP项目代码提交，包含分析API、前端开发助手、使用追踪等功能模块的修改和新增": 1,
           "移除smart_feedback_collector功能，包括工具定义、实现方法、测试代码和相关配置": 1
+        }
+      },
+      "error_patterns": []
+    },
+    "find_reusable_components": {
+      "total_calls": 2,
+      "successful_calls": 2,
+      "failed_calls": 0,
+      "first_used": "2025-06-16T09:09:58.757878",
+      "last_used": "2025-06-16T09:15:47.232852",
+      "avg_execution_time_ms": 46.964999999999996,
+      "total_execution_time_ms": 93.92999999999999,
+      "common_arguments": {
+        "project_path": {
+          "/Users/rabbitsbear/project/fshows/fs-codeOrder-web": 1,
+          "/Users/rabbitsbear/project/fshows/fs-codeOrg": 1
+        },
+        "component_type": {
+          "modal": 2
+        },
+        "search_keywords": {
+          "['modal', 'dialog', 'popup', '弹窗', '对话框']": 2
         }
       },
       "error_patterns": []
