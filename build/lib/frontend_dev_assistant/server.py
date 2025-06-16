@@ -162,8 +162,6 @@ class FrontendDevMCP:
                         "required": ["date_range"]
                     }
                 ),
-                
-
             ]
         
         @self.server.call_tool()
