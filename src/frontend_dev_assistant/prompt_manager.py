@@ -36,8 +36,6 @@ class PromptManager:
 - 避免混合不相关的改动
 
 {context}""",
-                "usage_count": 0,
-                "last_used": None,
                 "tags": ["git", "提交", "代码管理"]
             },
             
@@ -69,8 +67,6 @@ class PromptManager:
 - 避免使用魔法值，定义为常量
 
 {context}""",
-                "usage_count": 0,
-                "last_used": None,
                 "tags": ["代码审查", "质量检查", "规范"]
             },
             
@@ -106,8 +102,6 @@ class PromptManager:
 - 添加必要的注释说明
 
 {context}""",
-                "usage_count": 0,
-                "last_used": None,
                 "tags": ["组件复用", "代码生成", "效率工具"]
             },
             
@@ -153,8 +147,6 @@ class PromptManager:
 - 使用示例和文档
 
 {context}""",
-                "usage_count": 0,
-                "last_used": None,
                 "tags": ["Vue组件", "代码生成", "编码规范"]
             }
         }
@@ -178,13 +170,16 @@ class PromptManager:
             template_data = templates[prompt_type]
             template = template_data["template"]
             
-            # 更新使用记录
-            template_data["usage_count"] += 1
-            template_data["last_used"] = datetime.now().isoformat()
+            # 记录使用统计到单独的文件
+            usage_stats = self._load_usage_stats()
+            if prompt_type not in usage_stats:
+                usage_stats[prompt_type] = {"usage_count": 0, "last_used": None}
             
-            # 保存更新后的数据
-            with open(templates_file, 'w', encoding='utf-8') as f:
-                json.dump(templates, f, ensure_ascii=False, indent=2)
+            usage_stats[prompt_type]["usage_count"] += 1
+            usage_stats[prompt_type]["last_used"] = datetime.now().isoformat()
+            
+            # 保存使用统计到单独文件
+            self._save_usage_stats(usage_stats)
             
             # 替换上下文变量
             if context:
@@ -203,12 +198,32 @@ class PromptManager:
 {template}
 
 ---
-💡 使用次数：{template_data['usage_count']} | 标签：{', '.join(template_data['tags'])}
+💡 使用次数：{usage_stats[prompt_type]['usage_count']} | 标签：{', '.join(template_data['tags'])}
 """
             return result
             
         except Exception as e:
             return f"获取提示词模板时出错：{str(e)}"
+    
+    def _load_usage_stats(self) -> dict:
+        """加载使用统计数据"""
+        stats_file = self.templates_dir / "usage_stats.json"
+        if stats_file.exists():
+            try:
+                with open(stats_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except Exception:
+                return {}
+        return {}
+    
+    def _save_usage_stats(self, stats: dict) -> None:
+        """保存使用统计数据"""
+        stats_file = self.templates_dir / "usage_stats.json"
+        try:
+            with open(stats_file, 'w', encoding='utf-8') as f:
+                json.dump(stats, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"保存使用统计失败: {e}")
     
     async def add_custom_template(self, name: str, template: str, description: str = "", tags: List[str] = None) -> str:
         """添加自定义提示词模板"""
@@ -247,6 +262,9 @@ class PromptManager:
         try:
             result = "📚 **可用的提示词模板**\n\n"
             
+            # 加载使用统计
+            usage_stats = self._load_usage_stats()
+            
             # 加载默认模板
             templates_file = self.templates_dir / "default_templates.json"
             if templates_file.exists():
@@ -255,9 +273,10 @@ class PromptManager:
                 
                 result += "## 默认模板\n"
                 for key, template in templates.items():
+                    usage_count = usage_stats.get(key, {}).get('usage_count', 0)
                     result += f"- **{key}**: {template['name']}\n"
                     result += f"  {template['description']}\n"
-                    result += f"  使用次数: {template['usage_count']} | 标签: {', '.join(template['tags'])}\n\n"
+                    result += f"  使用次数: {usage_count} | 标签: {', '.join(template['tags'])}\n\n"
             
             # 加载自定义模板
             custom_file = self.templates_dir / "custom_templates.json"
@@ -268,9 +287,10 @@ class PromptManager:
                 if custom_templates:
                     result += "## 自定义模板\n"
                     for key, template in custom_templates.items():
+                        usage_count = usage_stats.get(key, {}).get('usage_count', 0)
                         result += f"- **{key}**: {template['name']}\n"
                         result += f"  {template['description']}\n"
-                        result += f"  使用次数: {template['usage_count']} | 标签: {', '.join(template['tags'])}\n\n"
+                        result += f"  使用次数: {usage_count} | 标签: {', '.join(template['tags'])}\n\n"
             
             return result
             

@@ -22,3 +22,6 @@ install.log*
 # Data files and statistics (runtime generated)
 src/data/mcp_calls.json
 src/data/usage_stats.json
+
+# Frontend dev assistant usage statistics
+**/usage_stats.json
