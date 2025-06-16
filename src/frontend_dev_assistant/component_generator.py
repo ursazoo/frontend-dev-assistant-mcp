@@ -6,9 +6,13 @@ Vue组件生成器模块
 import os
 import re
 import json
+import logging
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime
+
+# 配置日志
+logger = logging.getLogger(__name__)
 
 class ComponentGenerator:
     def __init__(self):
@@ -982,7 +986,7 @@ const emit = defineEmits<{
                 return f"未找到匹配的组件。{suggestions}"
             
             # 生成结果报告
-            return self._generate_component_report(filtered_components)
+            return self._format_component_suggestions(filtered_components)
             
         except Exception as e:
             return f"查找组件时出错：{str(e)}"
@@ -1054,44 +1058,9 @@ const emit = defineEmits<{
         return component_files
     
     def _analyze_component_file(self, file_path: Path) -> Optional[Dict]:
-        """分析组件文件，提取组件信息"""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-        except Exception as e:
-            print(f"无法读取文件 {file_path}: {e}")
-            return None
-        
-        # 检查是否为真正的UI组件
-        if not self._is_valid_ui_component(content, file_path):
-            return None
-        
-        # 优化组件名称提取 - 使用目录名而不是文件名
-        component_name = self._extract_component_name(file_path)
-        
-        # 提取组件信息
-        props = self._extract_props(content)
-        events = self._extract_events(content)
-        slots = self._extract_slots(content)
-        description = self._extract_description(content)
-        
-        # 分析组件功能特性
-        functional_type = self._analyze_component_functionality(content, props, events, component_name, file_path)
-        
-        component_info = {
-            "name": component_name,
-            "path": str(file_path),
-            "props": props,
-            "events": events,
-            "slots": slots,
-            "description": description,
-            "type": functional_type,
-            "is_wrapper": self._is_wrapper_component(content, file_path),
-            "dependency_type": self._get_dependency_type(file_path),
-            "features": self._extract_component_features(content, props, events)
-        }
-        
-        return component_info
+        """分析单个组件文件"""
+        # 使用新的改进后的分析方法
+        return self._analyze_single_component(file_path)
     
     def _is_valid_ui_component(self, content: str, file_path: Path) -> bool:
         """检查文件是否为有效的UI组件"""
@@ -1136,19 +1105,74 @@ const emit = defineEmits<{
         return False
     
     def _extract_component_name(self, file_path: Path) -> str:
-        """提取组件名称 - 优先使用目录名"""
+        """提取组件名称 - 智能命名算法"""
         # 如果文件名是 index.vue，使用父目录名
         if file_path.name == 'index.vue' or file_path.name == 'index.js' or file_path.name == 'index.tsx':
-            parent_dir = file_path.parent.name
-            # 转换为 PascalCase
-            return ''.join(word.capitalize() for word in parent_dir.replace('-', '_').split('_'))
+            original_name = file_path.parent.name
         else:
             # 使用文件名（去掉扩展名）
-            name = file_path.stem
+            original_name = file_path.stem
             # 处理常见的组件命名模式
-            if name.lower().endswith('component'):
-                name = name[:-9]  # 移除 'component' 后缀
-            return name
+            if original_name.lower().endswith('component'):
+                original_name = original_name[:-9]  # 移除 'component' 后缀
+        
+        return self._generate_smart_component_name(original_name, file_path)
+    
+    def _generate_smart_component_name(self, original_name: str, file_path: Path) -> str:
+        """智能组件命名算法 - 解决重名和通用命名问题"""
+        name_lower = original_name.lower()
+        path_parts = file_path.parts
+        
+        # 处理重名问题 - List, Index 等通用名称
+        if name_lower in ['list', 'index', 'item', 'card', 'box', 'page']:
+            return self._generate_contextual_name(file_path, original_name)
+        
+        # 处理过于通用的名称
+        generic_names = ['component', 'item', 'card', 'box', 'wrapper', 'container']
+        if any(generic in name_lower for generic in generic_names):
+            return self._generate_contextual_name(file_path, original_name)
+        
+        # 处理单字符或过短的名称
+        if len(original_name) <= 2:
+            return self._generate_contextual_name(file_path, original_name)
+        
+        return self._to_pascal_case(original_name)
+    
+    def _generate_contextual_name(self, file_path: Path, original_name: str) -> str:
+        """基于路径上下文生成组件名称"""
+        path_parts = [p for p in file_path.parts if p not in ['src', 'components', 'views', 'pages', 'index.vue', 'index.js', 'index.tsx']]
+        
+        # 获取最有意义的路径段
+        meaningful_parts = []
+        for part in reversed(path_parts[-4:]):  # 最多取4层路径
+            if part != file_path.stem and len(part) > 1:
+                meaningful_parts.append(part)
+            if len(meaningful_parts) >= 2:
+                break
+        
+        if meaningful_parts:
+            # 组合路径段生成名称
+            contextual_name = ''.join(self._to_pascal_case(part) for part in reversed(meaningful_parts))
+            
+            # 添加原始名称后缀（如果有意义）
+            if original_name.lower() not in ['index', 'item'] and len(original_name) > 2:
+                contextual_name += self._to_pascal_case(original_name)
+            elif 'list' in str(file_path).lower():
+                contextual_name += 'List'
+            elif 'card' in str(file_path).lower():
+                contextual_name += 'Card'
+            elif 'item' in str(file_path).lower():
+                contextual_name += 'Item'
+            
+            return contextual_name
+        
+        return self._to_pascal_case(original_name)
+    
+    def _to_pascal_case(self, text: str) -> str:
+        """转换为PascalCase"""
+        # 处理kebab-case和snake_case
+        words = text.replace('-', '_').replace(' ', '_').split('_')
+        return ''.join(word.capitalize() for word in words if word)
     
     def _extract_component_base_name(self, name: str) -> str:
         """提取组件的基础名称，去除通用前缀"""
@@ -1208,51 +1232,134 @@ const emit = defineEmits<{
         # 默认为项目组件
         return 'project'
     
-    def _extract_props(self, content: str) -> List[Dict]:
-        """提取组件Props"""
+    def _extract_props_and_events(self, content: str) -> Tuple[List[Dict], List[str]]:
+        """增强的props和events解析"""
+        props = self._extract_props_enhanced(content)
+        events = self._extract_events_enhanced(content)
+        return props, events
+    
+    def _extract_props_enhanced(self, content: str) -> List[Dict]:
+        """增强的props提取"""
+        try:
+            props = []
+            
+            # Vue 3 Composition API defineProps
+            defineprops_pattern = r'defineProps\s*\(\s*\{([^}]+)\}'
+            match = re.search(defineprops_pattern, content, re.DOTALL)
+            if match:
+                props_content = match.group(1)
+                parsed_props = self._parse_props_object(props_content)
+                if isinstance(parsed_props, list):
+                    props.extend(parsed_props)
+            
+            # Vue 2 Options API props
+            options_props_pattern = r'props\s*:\s*\{([^}]+)\}'
+            match = re.search(options_props_pattern, content, re.DOTALL)
+            if match:
+                props_content = match.group(1)
+                parsed_props = self._parse_props_object(props_content)
+                if isinstance(parsed_props, list):
+                    props.extend(parsed_props)
+            
+            # 数组形式的props声明
+            array_props_pattern = r'props\s*:\s*\[([^\]]+)\]'
+            match = re.search(array_props_pattern, content)
+            if match:
+                props_array = match.group(1)
+                prop_names = re.findall(r'[\'"`]([^\'"`]+)[\'"`]', props_array)
+                for name in prop_names:
+                    props.append({
+                        'name': name,
+                        'type': 'unknown',
+                        'required': False,
+                        'default': None
+                    })
+            
+            return props
+        except Exception as e:
+            logger.error(f"提取props时出错: {str(e)}")
+            return []
+    
+    def _parse_props_object(self, props_content: str) -> List[Dict]:
+        """解析props对象定义"""
         props = []
         
-        # 匹配defineProps的内容
-        props_pattern = r'defineProps<([^>]+)>'
-        match = re.search(props_pattern, content)
+        # 匹配每个prop定义
+        prop_pattern = r'(\w+)\s*:\s*\{([^}]+)\}'
+        for match in re.finditer(prop_pattern, props_content, re.DOTALL):
+            prop_name = match.group(1)
+            prop_def = match.group(2)
+            
+            # 解析prop属性
+            prop_info = {'name': prop_name, 'type': 'unknown', 'required': False, 'default': None}
+            
+            # 提取type
+            type_match = re.search(r'type\s*:\s*(\w+)', prop_def)
+            if type_match:
+                prop_info['type'] = type_match.group(1)
+            
+            # 提取required
+            if 'required: true' in prop_def:
+                prop_info['required'] = True
+            
+            # 提取default
+            default_match = re.search(r'default\s*:\s*([^,\n]+)', prop_def)
+            if default_match:
+                prop_info['default'] = default_match.group(1).strip()
+            
+            props.append(prop_info)
         
-        if match:
-            props_interface = match.group(1)
-            # 简单解析props（实际应该用更复杂的AST解析）
-            prop_lines = props_interface.split('\n')
-            for line in prop_lines:
-                line = line.strip()
-                if ':' in line and not line.startswith('//'):
-                    prop_match = re.match(r'(\w+)\??\s*:\s*(.+)', line)
-                    if prop_match:
-                        props.append({
-                            "name": prop_match.group(1),
-                            "type": prop_match.group(2).rstrip(','),
-                            "required": '?' not in line
-                        })
+        # 简单的prop声明（直接类型）
+        simple_prop_pattern = r'(\w+)\s*:\s*(\w+)(?:\s*,|\s*$)'
+        for match in re.finditer(simple_prop_pattern, props_content):
+            prop_name = match.group(1)
+            prop_type = match.group(2)
+            # 避免重复添加
+            if not any(p['name'] == prop_name for p in props):
+                props.append({
+                    'name': prop_name,
+                    'type': prop_type,
+                    'required': False,
+                    'default': None
+                })
         
         return props
     
-    def _extract_events(self, content: str) -> List[str]:
-        """提取组件事件"""
-        events = []
-        
-        # 匹配defineEmits的内容
-        events_pattern = r'defineEmits<\{([^}]+)\}>'
-        match = re.search(events_pattern, content)
-        
-        if match:
-            events_content = match.group(1)
-            event_lines = events_content.split('\n')
-            for line in event_lines:
-                line = line.strip()
-                if ':' in line and not line.startswith('//'):
-                    event_match = re.match(r'(\w+|\'\w+\'|"\w+")', line)
-                    if event_match:
-                        event_name = event_match.group(1).strip('\'"')
-                        events.append(event_name)
-        
-        return events
+    def _extract_events_enhanced(self, content: str) -> List[str]:
+        """增强的events提取"""
+        try:
+            events = set()
+            
+            # Vue 3 defineEmits
+            defineemits_pattern = r'defineEmits\s*\(\s*\[([^\]]+)\]'
+            match = re.search(defineemits_pattern, content)
+            if match:
+                emits_content = match.group(1)
+                event_names = re.findall(r'[\'"`]([^\'"`]+)[\'"`]', emits_content)
+                events.update(event_names)
+            
+            # Vue 2 emits选项
+            emits_pattern = r'emits\s*:\s*\[([^\]]+)\]'
+            match = re.search(emits_pattern, content)
+            if match:
+                emits_content = match.group(1)
+                event_names = re.findall(r'[\'"`]([^\'"`]+)[\'"`]', emits_content)
+                events.update(event_names)
+            
+            # $emit调用
+            emit_pattern = r'\$emit\s*\(\s*[\'"`]([^\'"`]+)[\'"`]'
+            emit_matches = re.findall(emit_pattern, content)
+            events.update(emit_matches)
+            
+            # this.$emit调用
+            this_emit_pattern = r'this\.\$emit\s*\(\s*[\'"`]([^\'"`]+)[\'"`]'
+            this_emit_matches = re.findall(this_emit_pattern, content)
+            events.update(this_emit_matches)
+            
+            return list(events)
+        except Exception as e:
+            logger.error(f"提取events时出错: {str(e)}")
+            return []
     
     def _extract_slots(self, content: str) -> List[str]:
         """提取组件插槽"""
@@ -1270,15 +1377,105 @@ const emit = defineEmits<{
         return list(set(slots))
     
     def _extract_description(self, content: str) -> str:
-        """提取组件描述"""
-        # 从注释中提取描述
-        comment_pattern = r'/\*\*\s*\n\s*\*\s*([^\n]+)'
-        match = re.search(comment_pattern, content)
+        """智能描述生成 - 基于组件内容和结构分析"""
+        # 1. 优先查找组件级别的注释（非 @function）
+        component_comment = self._extract_component_level_comment(content)
+        if component_comment and not component_comment.startswith('@function'):
+            return component_comment
         
-        if match:
-            return match.group(1).strip()
+        # 2. 如果没有有效注释，基于代码结构生成描述
+        return self._generate_smart_description(content)
+    
+    def _extract_component_level_comment(self, content: str) -> str:
+        """提取组件级别的注释"""
+        # Vue组件的注释模式
+        patterns = [
+            r'<!--\s*([^@][^->]*?)\s*-->',  # HTML注释，排除@function
+            r'/\*\*\s*\n\s*\*\s*([^@][^*]*?)\s*\*/',  # JSDoc注释
+            r'//\s*([^@][^\n]*)',  # 单行注释
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, content, re.DOTALL)
+            if match:
+                comment = match.group(1).strip()
+                # 排除明显的函数注释和无意义注释
+                if (not comment.startswith('@') and 
+                    len(comment) > 10 and 
+                    not comment.startswith('eslint') and
+                    not comment.startswith('TODO')):
+                    return comment
         
         return ""
+    
+    def _generate_smart_description(self, content: str) -> str:
+        """基于代码结构生成智能描述"""
+        template_features = self._analyze_template_features(content)
+        interaction_capabilities = self._analyze_interaction_capabilities(content)
+        
+        # 组合生成描述
+        if template_features and interaction_capabilities:
+            return f"{template_features}，{interaction_capabilities}"
+        elif template_features:
+            return template_features
+        elif interaction_capabilities:
+            return interaction_capabilities
+        else:
+            return "可复用组件"
+    
+    def _analyze_template_features(self, content: str) -> str:
+        """分析模板功能特性"""
+        features = []
+        content_lower = content.lower()
+        
+        if 'v-for' in content_lower or ':key=' in content_lower:
+            features.append('支持列表渲染')
+        if 'v-model' in content_lower:
+            features.append('支持双向绑定')
+        if '@click' in content_lower or '@tap' in content_lower:
+            features.append('支持点击交互')
+        if 'v-if' in content_lower or 'v-show' in content_lower:
+            features.append('支持条件显示')
+        if 'swiper' in content_lower:
+            features.append('支持轮播功能')
+        if 'loading' in content_lower:
+            features.append('支持加载状态')
+        if 'input' in content_lower or 'textarea' in content_lower:
+            features.append('支持表单输入')
+        if 'button' in content_lower:
+            features.append('支持操作按钮')
+        if 'draggable' in content_lower:
+            features.append('支持拖拽排序')
+        if 'dialog' in content_lower or 'modal' in content_lower:
+            features.append('支持弹窗显示')
+        if 'table' in content_lower or 'tr>' in content_lower:
+            features.append('支持表格展示')
+        if 'form' in content_lower:
+            features.append('支持表单操作')
+        
+        return '、'.join(features) if features else '基础展示组件'
+    
+    def _analyze_interaction_capabilities(self, content: str) -> str:
+        """分析交互能力"""
+        capabilities = []
+        content_lower = content.lower()
+        
+        if 'computed' in content_lower:
+            capabilities.append('响应式计算')
+        if 'watch' in content_lower:
+            capabilities.append('数据监听')
+        if 'router' in content_lower or '$router' in content_lower:
+            capabilities.append('路由导航')
+        if 'axios' in content_lower or 'request' in content_lower or 'api' in content_lower:
+            capabilities.append('数据请求')
+        if '$emit' in content_lower:
+            capabilities.append('事件通信')
+        if 'vuex' in content_lower or '$store' in content_lower:
+            capabilities.append('状态管理')
+        if 'mounted' in content_lower or 'created' in content_lower:
+            capabilities.append('生命周期处理')
+        
+        return '、'.join(capabilities) if capabilities else ''
     
     def _analyze_component_functionality(self, content: str, props: List[Dict], events: List[str], name: str, file_path: Path) -> str:
         """通过内容、props和events分析组件功能类型"""
@@ -1710,95 +1907,32 @@ const emit = defineEmits<{
     def _generate_search_suggestions(self, all_components: List[Dict], keywords: Optional[List[str]]) -> str:
         """生成搜索建议"""
         if not all_components:
-            return ""
+            return "\n\n💡 **搜索建议**: 项目中没有发现组件文件，请检查项目路径是否正确。"
         
-        # 统计可用的组件类型
-        available_types = {}
+        # 获取所有组件类型和名称作为建议
+        component_types = set()
+        component_names = []
+        
         for comp in all_components:
-            comp_type = comp.get('type', 'unknown')
-            available_types[comp_type] = available_types.get(comp_type, 0) + 1
+            if comp.get('features'):
+                component_types.update(comp['features'])
+            component_names.append(comp['name'].lower())
         
-        # 生成建议
-        suggestions = []
+        suggestions = ["\n\n💡 **搜索建议**:"]
         
-        if keywords:
-            # 基于关键词提供相似组件建议
-            similar_comps = []
-            for comp in all_components[:5]:  # 只看前5个
-                name = comp.get('name', '')
-                if any(self._string_similarity(kw.lower(), name.lower()) > 0.3 for kw in keywords):
-                    similar_comps.append(name)
-            
-            if similar_comps:
-                suggestions.append(f"可能相关的组件：{', '.join(similar_comps)}")
+        if component_types:
+            type_list = list(component_types)[:5]  # 只显示前5个
+            suggestions.append(f"- 尝试搜索组件类型: {', '.join(type_list)}")
         
-        # 提供类型建议
-        popular_types = sorted(available_types.items(), key=lambda x: x[1], reverse=True)[:3]
-        if popular_types:
-            type_list = [f"{t[0]}({t[1]}个)" for t in popular_types]
-            suggestions.append(f"项目中主要组件类型：{', '.join(type_list)}")
+        if component_names:
+            name_list = list(set(component_names))[:5]  # 只显示前5个唯一名称
+            suggestions.append(f"- 尝试搜索组件名称: {', '.join(name_list)}")
         
-        return " ".join(suggestions) if suggestions else "建议检查搜索关键词或组件类型。"
+        suggestions.append("- 使用更通用的关键词，如: button, list, form, card")
+        
+        return '\n'.join(suggestions)
     
-    def _generate_component_report(self, components: List[Dict]) -> str:
-        """生成组件查找报告"""
-        if not components:
-            return "未找到匹配的组件"
-        
-        report = f"## 🔍 找到 {len(components)} 个可复用组件\n\n"
-        
-        for i, component in enumerate(components, 1):
-            name = component['name']
-            type_str = component['type']
-            is_wrapper = component.get('is_wrapper', False)
-            dep_type = component.get('dependency_type', 'unknown')
-            features = component.get('features', [])
-            
-            # 添加组件类型标识
-            type_badge = f"**类型**: {type_str}"
-            if is_wrapper:
-                type_badge += " (二次封装)"
-            if dep_type == 'third_party':
-                type_badge += " (第三方)"
-            
-            report += f"### {i}. {name}\n\n"
-            report += f"{type_badge}\n"
-            report += f"**路径**: `{component['path']}`\n"
-            
-            if component['description']:
-                report += f"**描述**: {component['description']}\n"
-            
-            # 显示功能特性
-            if features:
-                report += f"**功能特性**: {', '.join(features)}\n"
-            
-            if component['props']:
-                report += f"**Props**: \n"
-                for prop in component['props']:
-                    required = "必填" if prop['required'] else "可选"
-                    report += f"- `{prop['name']}`: {prop['type']} ({required})\n"
-            
-            if component['events']:
-                report += f"**事件**: {', '.join(component['events'])}\n"
-            
-            if component['slots']:
-                report += f"**插槽**: {', '.join(component['slots'])}\n"
-            
-            # 生成使用示例
-            report += f"\n**使用示例**:\n```vue\n"
-            report += f"<template>\n  <{self._to_kebab_case(name)}"
-            
-            if component['props']:
-                report += f"\n    {self._generate_props_example(component['props'])}"
-            
-            report += f"\n  />\n</template>\n\n"
-            report += f"<script setup>\n"
-            report += f"import {name} from '{component['path']}'\n"
-            report += f"</script>\n```\n\n"
-            
-            report += "---\n\n"
-        
-        return report
+
     
     def _generate_props_example(self, props: List[Dict]) -> str:
         """生成props使用示例"""
@@ -1899,3 +2033,157 @@ const emit = defineEmits<{
             main_desc = main_desc[:27] + "..."
         
         return main_desc 
+
+    def _analyze_single_component(self, file_path: Path) -> Optional[Dict]:
+        """分析单个组件文件 - 根据改进规格重构"""
+        try:
+            with open(file_path, 'r', encoding='utf-8') as f:
+                content = f.read()
+                
+            # 智能组件命名
+            name = self._extract_component_name(file_path)
+            
+            # 增强的代码解析
+            props, events = self._extract_props_and_events(content)
+            
+            # 确保数据类型正确
+            if not isinstance(props, list):
+                props = []
+            if not isinstance(events, list):
+                events = []
+                
+            slots = self._extract_slots(content)
+            if not isinstance(slots, list):
+                slots = []
+            
+            # 智能描述生成
+            description = self._extract_description(content)
+            if not isinstance(description, str):
+                description = "可复用组件"
+            
+            # 功能特性分析
+            features = self._extract_features(content)
+            if not isinstance(features, list):
+                features = []
+            
+            # 使用场景推断
+            usage_scenario = self._infer_usage_scenario(file_path, content)
+            if not isinstance(usage_scenario, str):
+                usage_scenario = "通用场景"
+            
+            return {
+                "name": name,
+                "path": str(file_path),
+                "description": description,
+                "props": [prop.get('name', '') if isinstance(prop, dict) else str(prop) for prop in props],  # 安全的props处理
+                "events": events,
+                "features": features,
+                "usage_scenario": usage_scenario,
+                "props_detail": props,  # 详细的props信息
+                "slots": slots
+            }
+            
+        except Exception as e:
+            logger.error(f"分析组件时出错 {file_path}: {str(e)}")
+            return None
+    
+    def _extract_features(self, content: str) -> List[str]:
+        """提取组件功能特性"""
+        features = []
+        content_lower = content.lower()
+        
+        # 基于模板分析
+        if 'v-for' in content_lower or ':key=' in content_lower:
+            features.append('列表渲染')
+        if 'draggable' in content_lower:
+            features.append('拖拽排序')
+        if 'swiper' in content_lower:
+            features.append('轮播展示')
+        if 'v-model' in content_lower:
+            features.append('双向绑定')
+        if 'loading' in content_lower:
+            features.append('加载状态')
+        if 'dialog' in content_lower or 'modal' in content_lower:
+            features.append('弹窗显示')
+        if 'table' in content_lower:
+            features.append('表格展示')
+        
+        # 基于脚本分析
+        if 'computed' in content_lower:
+            features.append('响应式计算')
+        if 'watch' in content_lower:
+            features.append('数据监听')
+        if 'router' in content_lower or '$router' in content_lower:
+            features.append('路由导航')
+        if 'axios' in content_lower or 'request' in content_lower or 'api' in content_lower:
+            features.append('数据请求')
+        if '$emit' in content_lower:
+            features.append('事件通信')
+        if 'vuex' in content_lower or '$store' in content_lower:
+            features.append('状态管理')
+        
+        return features
+    
+    def _infer_usage_scenario(self, file_path: Path, content: str) -> str:
+        """推断使用场景"""
+        path_lower = str(file_path).lower()
+        
+        # 基于路径位置
+        if '/views/' in path_lower or '/pages/' in path_lower:
+            return '完整页面组件，适用于路由页面'
+        elif '/components/' in path_lower:
+            return '可复用组件，适用于多个页面'
+        
+        # 基于功能域
+        if 'manage' in path_lower:
+            return '管理系统页面或组件'
+        elif 'list' in path_lower:
+            return '列表展示相关场景'
+        elif 'item' in path_lower:
+            return '单个数据项展示'
+        elif 'modal' in path_lower or 'dialog' in path_lower:
+            return '弹窗组件场景'
+        elif 'form' in path_lower:
+            return '表单相关场景'
+        
+        return '通用场景'
+
+    def _format_component_info(self, component: Dict) -> str:
+        """格式化组件信息输出 - 根据改进规格重构"""
+        name = component.get('name', 'Unknown')
+        path = component.get('path', '')
+        description = component.get('description', '暂无描述')
+        props = component.get('props', [])
+        events = component.get('events', [])
+        features = component.get('features', [])
+        usage_scenario = component.get('usage_scenario', '通用场景')
+        
+        output = [f"### {name}"]
+        output.append(f"**路径**: `{path}`")
+        output.append(f"**描述**: {description}")
+        
+        if props:
+            output.append(f"**Props**: {', '.join(props)}")
+        
+        if events:
+            output.append(f"**事件**: {', '.join(events)}")
+        
+        if features:
+            output.append(f"**功能特性**: {', '.join(features)}")
+        
+        output.append(f"**适用场景**: {usage_scenario}")
+        
+        return '\n'.join(output) + '\n'
+
+    def _format_component_suggestions(self, components: List[Dict]) -> str:
+        """格式化组件建议输出"""
+        if not components:
+            return "未找到匹配的可复用组件。"
+        
+        output = [f"找到 {len(components)} 个可复用组件:\n"]
+        
+        for i, component in enumerate(components, 1):
+            formatted_info = self._format_component_info(component)
+            output.append(formatted_info)
+        
+        return '\n'.join(output)
