@@ -991,28 +991,57 @@ const emit = defineEmits<{
         """查找项目中的Vue组件文件"""
         component_files = []
         
-        # 扩展的组件目录搜索
-        search_dirs = [
+        # 排除目录列表
+        exclude_dirs = {
+            'node_modules', '.git', 'dist', 'build', '.vscode', '.idea', 
+            'coverage', 'test', 'tests', '__pycache__', '.pytest_cache',
+            '.next', '.nuxt', 'out', 'public', 'static'
+        }
+        
+        # 优先搜索的组件目录
+        priority_dirs = [
             "src/components",
             "src/views", 
             "src/pages",
             "components",
-            "views",
-            "pages",
-            "src",  # 直接搜索src目录
-            "."     # 搜索整个项目根目录
+            "views", 
+            "pages"
         ]
         
-        # 支持更多文件类型
-        file_patterns = ["*.vue", "*.jsx", "*.tsx", "*.js", "*.ts"]
+        # 次级搜索目录
+        secondary_dirs = [
+            "src",
+            "app",
+            "lib"
+        ]
         
-        for search_dir in search_dirs:
+        # 支持的组件文件类型
+        component_patterns = ["*.vue", "*.jsx", "*.tsx"]
+        
+        def should_exclude_path(path: Path) -> bool:
+            """检查路径是否应该被排除"""
+            path_parts = path.parts
+            return any(exclude_dir in path_parts for exclude_dir in exclude_dirs)
+        
+        # 首先搜索优先目录
+        for search_dir in priority_dirs:
             component_dir = project_dir / search_dir
-            if component_dir.exists():
-                # 递归查找多种组件文件
-                for pattern in file_patterns:
+            if component_dir.exists() and not should_exclude_path(component_dir):
+                for pattern in component_patterns:
                     files = list(component_dir.rglob(pattern))
+                    # 过滤掉被排除的路径
+                    files = [f for f in files if not should_exclude_path(f)]
                     component_files.extend(files)
+        
+        # 如果优先目录没找到足够组件，搜索次级目录
+        if len(component_files) < 5:
+            for search_dir in secondary_dirs:
+                component_dir = project_dir / search_dir
+                if component_dir.exists() and not should_exclude_path(component_dir):
+                    for pattern in component_patterns:
+                        files = list(component_dir.rglob(pattern))
+                        files = [f for f in files if not should_exclude_path(f)]
+                        component_files.extend(files)
         
         # 去重
         component_files = list(set(component_files))
@@ -1029,37 +1058,82 @@ const emit = defineEmits<{
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-            
-            # 优化组件名称提取 - 使用目录名而不是文件名
-            component_name = self._extract_component_name(file_path)
-            
-            # 提取组件信息
-            props = self._extract_props(content)
-            events = self._extract_events(content)
-            slots = self._extract_slots(content)
-            description = self._extract_description(content)
-            
-            # 分析组件功能特性
-            functional_type = self._analyze_component_functionality(content, props, events, component_name, file_path)
-            
-            component_info = {
-                "name": component_name,
-                "path": str(file_path),
-                "props": props,
-                "events": events,
-                "slots": slots,
-                "description": description,
-                "type": functional_type,
-                "is_wrapper": self._is_wrapper_component(content, file_path),
-                "dependency_type": self._get_dependency_type(file_path),
-                "features": self._extract_component_features(content, props, events)
-            }
-            
-            return component_info
-            
         except Exception as e:
-            print(f"分析组件文件失败 {file_path}: {e}")
+            print(f"无法读取文件 {file_path}: {e}")
             return None
+        
+        # 检查是否为真正的UI组件
+        if not self._is_valid_ui_component(content, file_path):
+            return None
+        
+        # 优化组件名称提取 - 使用目录名而不是文件名
+        component_name = self._extract_component_name(file_path)
+        
+        # 提取组件信息
+        props = self._extract_props(content)
+        events = self._extract_events(content)
+        slots = self._extract_slots(content)
+        description = self._extract_description(content)
+        
+        # 分析组件功能特性
+        functional_type = self._analyze_component_functionality(content, props, events, component_name, file_path)
+        
+        component_info = {
+            "name": component_name,
+            "path": str(file_path),
+            "props": props,
+            "events": events,
+            "slots": slots,
+            "description": description,
+            "type": functional_type,
+            "is_wrapper": self._is_wrapper_component(content, file_path),
+            "dependency_type": self._get_dependency_type(file_path),
+            "features": self._extract_component_features(content, props, events)
+        }
+        
+        return component_info
+    
+    def _is_valid_ui_component(self, content: str, file_path: Path) -> bool:
+        """检查文件是否为有效的UI组件"""
+        content_lower = content.lower()
+        file_name = file_path.name.lower()
+        
+        # 排除明显的非组件文件
+        exclude_patterns = [
+            'interop', 'helper', 'util', 'config', 'constant', 'type', 'interface',
+            '.d.ts', '.spec.', '.test.', 'babel', 'runtime', 'polyfill',
+            'webpack', 'rollup', 'build', 'demo.spec', 'index.spec'
+        ]
+        
+        if any(pattern in file_name for pattern in exclude_patterns):
+            return False
+        
+        # Vue组件必须包含template或render
+        if file_path.suffix == '.vue':
+            if '<template>' in content_lower or 'render' in content_lower:
+                return True
+            return False
+        
+        # React组件检查
+        if file_path.suffix in ['.jsx', '.tsx']:
+            react_indicators = [
+                'react', 'jsx', 'component', 'return (', 'export default',
+                'usestate', 'useeffect', 'props', 'render'
+            ]
+            
+            if any(indicator in content_lower for indicator in react_indicators):
+                # 确保不是工具函数
+                utility_indicators = [
+                    'module.exports = ', 'export function', 'export const', 
+                    'export { default }', 'interopRequire', 'helpers'
+                ]
+                
+                if any(indicator in content_lower for indicator in utility_indicators):
+                    return False
+                    
+                return True
+        
+        return False
     
     def _extract_component_name(self, file_path: Path) -> str:
         """提取组件名称 - 优先使用目录名"""
@@ -1115,12 +1189,24 @@ const emit = defineEmits<{
     def _get_dependency_type(self, file_path: Path) -> str:
         """获取依赖类型"""
         path_str = str(file_path)
-        if 'node_modules' in path_str:
+        path_parts = file_path.parts
+        
+        # 第三方库检查
+        if 'node_modules' in path_parts:
             return 'third_party'
-        elif any(prefix in path_str.lower() for prefix in ['src/components', 'components']):
+        
+        # 项目组件检查
+        project_indicators = ['src/components', 'components', 'src/views', 'views']
+        if any(indicator in path_str for indicator in project_indicators):
             return 'project'
-        else:
+        
+        # 页面组件
+        page_indicators = ['src/pages', 'pages', 'src/views', 'views']
+        if any(indicator in path_str for indicator in page_indicators):
             return 'view'
+        
+        # 默认为项目组件
+        return 'project'
     
     def _extract_props(self, content: str) -> List[Dict]:
         """提取组件Props"""
