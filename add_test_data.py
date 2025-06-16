@@ -61,8 +61,7 @@ def add_test_data_directly():
         "generate_vue_component",
         "find_reusable_components", 
         "get_prompt_template",
-        "track_usage",
-        "smart_feedback_collector"
+        "track_usage"
     ]
     
     print("\n📊 添加使用记录...")

@@ -164,47 +164,12 @@ async def test_enhanced_usage_tracker():
     all_stats = await tracker.get_stats("all")
     print(all_stats)
 
-async def test_smart_feedback():
-    """测试智能反馈收集"""
-    print("\n" + "="*50)
-    print("💬 测试智能反馈收集功能")
-    print("="*50)
-    
-    tracker = UsageTracker()
-    
-    # 生成反馈提示
-    feedback_prompt = await tracker.collect_smart_feedback(
-        task_summary="使用Cursor生成了一个完整的Vue3购物车组件",
-        allow_skip=True
-    )
-    
-    print("反馈提示:")
-    print(feedback_prompt)
-    
-    # 模拟不同的反馈响应
-    test_responses = [
-        ("excellent", "优秀反馈"),
-        ("跳过", "跳过反馈"),
-        ("good", "良好反馈"),
-        ("1", "数字跳过"),
-        ("invalid_response", "无效反馈")
-    ]
-    
-    for response, description in test_responses:
-        result = await tracker.process_feedback_response(
-            response=response,
-            task_name="vue3_component_generation"
-        )
-        print(f"\n{description} - 响应: '{response}'")
-        print(f"处理结果: {result}")
+
 
 if __name__ == "__main__":
     print("🚀 开始测试增强版 Usage Tracker")
     
     # 运行基础功能测试
     asyncio.run(test_enhanced_usage_tracker())
-    
-    # 运行反馈收集测试
-    asyncio.run(test_smart_feedback())
     
     print("\n✅ 所有测试完成！") 
