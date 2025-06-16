@@ -1075,7 +1075,23 @@ const emit = defineEmits<{
             if name.lower().endswith('component'):
                 name = name[:-9]  # 移除 'component' 后缀
             return name
-
+    
+    def _extract_component_base_name(self, name: str) -> str:
+        """提取组件的基础名称，去除通用前缀"""
+        name_lower = name.lower()
+        
+        # 常见的组件前缀
+        common_prefixes = ['base', 'common', 'fs', 'fb', 'my', 'custom', 'app', 'ui']
+        
+        for prefix in common_prefixes:
+            if name_lower.startswith(prefix):
+                # 移除前缀并返回剩余部分
+                remaining = name[len(prefix):]
+                if remaining:  # 确保移除前缀后还有内容
+                    return remaining
+        
+        return name
+    
     def _is_wrapper_component(self, content: str, file_path: Path) -> bool:
         """判断是否为二次封装组件"""
         content_lower = content.lower()
@@ -1091,7 +1107,7 @@ const emit = defineEmits<{
         
         # 检查目录结构是否表明是二次封装
         path_str = str(file_path).lower()
-        wrapper_indicators = ['fb', 'fs', 'custom', 'base', 'my']
+        wrapper_indicators = ['base', 'common', 'fs', 'fb', 'custom', 'my', 'ui', 'app']
         has_wrapper_prefix = any(indicator in path_str for indicator in wrapper_indicators)
         
         return has_ui_import or has_wrapper_prefix
@@ -1351,19 +1367,25 @@ const emit = defineEmits<{
         # 按相似度排序
         scored_components.sort(key=lambda x: x[1], reverse=True)
         
-        # 降低相似度阈值，特别是对button类组件
-        threshold = 0.15  # 从0.3降低到0.15
-        if keywords and any('button' in kw.lower() or 'btn' in kw.lower() for kw in keywords):
-            threshold = 0.1  # button组件更低阈值
+        # 动态阈值策略
+        base_threshold = 0.15
         
-        filtered = [comp for comp, score in scored_components if score >= threshold]
+        # 如果有高质量匹配，使用标准阈值
+        high_quality_matches = [comp for comp, score in scored_components if score >= 0.6]
+        if high_quality_matches:
+            return high_quality_matches
         
-        # 如果没找到任何组件，进一步降低阈值重试
-        if not filtered and scored_components:
+        # 如果有中等质量匹配，使用中等阈值
+        medium_quality_matches = [comp for comp, score in scored_components if score >= base_threshold]
+        if medium_quality_matches:
+            return medium_quality_matches
+        
+        # 如果没找到任何组件，降低阈值包含潜在匹配
+        if scored_components:
             emergency_threshold = 0.05
-            filtered = [comp for comp, score in scored_components if score >= emergency_threshold]
+            return [comp for comp, score in scored_components if score >= emergency_threshold]
         
-        return filtered
+        return []
     
     def _calculate_component_similarity(
         self, 
@@ -1434,7 +1456,7 @@ const emit = defineEmits<{
             'form': ['input', 'field', 'control'],
             'table': ['grid', 'list', 'dataview'],
             'modal': ['dialog', 'popup', 'overlay'],
-            'button': ['btn', 'link', 'action', 'common', 'base'],
+            'button': ['btn', 'link', 'action'],
             'input': ['field', 'control', 'form']
         }
         
@@ -1448,14 +1470,21 @@ const emit = defineEmits<{
             if main_type == comp_type and target_type in related:
                 return 0.7
         
-        # 特殊处理：检查组件名称中是否包含目标类型的同义词
-        comp_name = component.get('name', '').lower()
-        comp_path = component.get('path', '').lower()
+        # 通用组件名称匹配
+        comp_name = component.get('name', '')
+        comp_path = component.get('path', '')
         
-        if target_type == 'button':
-            button_indicators = ['button', 'btn', 'common', 'base', 'action', 'click']
-            if any(indicator in comp_name or indicator in comp_path for indicator in button_indicators):
-                return 0.6
+        # 获取去除前缀的基础名称
+        base_name = self._extract_component_base_name(comp_name).lower()
+        
+        # 检查基础名称是否包含目标类型
+        if target_type.lower() in base_name:
+            return 0.6
+        
+        # 检查完整名称和路径
+        all_text = f"{comp_name} {comp_path}".lower()
+        if target_type.lower() in all_text:
+            return 0.5
         
         return 0.0
     
@@ -1530,26 +1559,37 @@ const emit = defineEmits<{
             return 0.0
         
         name_lower = component_name.lower()
+        # 获取去除前缀的基础名称
+        base_name_lower = self._extract_component_base_name(component_name).lower()
         max_similarity = 0.0
         
         for keyword in keywords:
             keyword_lower = keyword.lower()
             
-            # 完全匹配
-            if keyword_lower == name_lower:
-                max_similarity = max(max_similarity, 1.0)
-                continue
+            # 对原名称的匹配
+            original_similarity = self._calculate_single_name_similarity(name_lower, keyword_lower)
             
-            # 包含匹配
-            if keyword_lower in name_lower or name_lower in keyword_lower:
-                max_similarity = max(max_similarity, 0.8)
-                continue
+            # 对基础名称的匹配（去除前缀后）
+            base_similarity = self._calculate_single_name_similarity(base_name_lower, keyword_lower)
             
-            # 编辑距离相似度
-            similarity = self._string_similarity(keyword_lower, name_lower)
-            max_similarity = max(max_similarity, similarity)
+            # 取两者中的最高分
+            best_similarity = max(original_similarity, base_similarity)
+            max_similarity = max(max_similarity, best_similarity)
         
         return max_similarity
+    
+    def _calculate_single_name_similarity(self, name: str, keyword: str) -> float:
+        """计算单个名称与关键词的相似度"""
+        # 完全匹配
+        if keyword == name:
+            return 1.0
+        
+        # 包含匹配
+        if keyword in name or name in keyword:
+            return 0.8
+        
+        # 编辑距离相似度
+        return self._string_similarity(keyword, name)
     
     def _fuzzy_match(self, keyword: str, text: str) -> float:
         """模糊匹配算法"""
