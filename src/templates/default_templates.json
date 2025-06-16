@@ -2,7 +2,7 @@
   "git_commit": {
     "name": "Git 代码提交助手",
     "description": "帮助开发者分批次、规范化提交代码",
-    "template": "帮我分批次提交代码。请先检查 git status，然后分析所有未暂存的修改，并一次性提供一个完整的、按模块或功能分组的提交计划。\n\n计划应包含：\n1. 每个批次要提交的文件列表\n2. 为每个批次建议的 commit message (格式为 feat/fix: 中文描述)\n\n请等待我确认或修改计划后再执行任何 git 命令。\n\n注意事项：\n- 遵循 Conventional Commits 规范\n- commit message 使用中文描述\n- 按功能模块合理分组\n- 避免混合不相关的改动\n\n{context}",
+    "template": "帮我分批次提交代码。请先检查 git status，然后分析所有未暂存的修改，并提供一个完整的提交计划。\n\n提交规范：\n- **标题格式**：`类型: 简短描述`（不超过50字符）\n- **类型**：feat/fix/docs/style/refactor/test/chore/config\n- **描述**：使用中文，简洁明了\n- **详细信息**：如需要，放在commit body中\n\n计划应包含：\n1. 每个批次要提交的文件列表\n2. 为每个批次建议简洁的 commit message\n\n示例格式：\n- `feat: 新增用户登录功能`\n- `fix: 修复数据加载异常`\n- `docs: 更新API文档`\n- `refactor: 优化组件结构`\n\n请等待我确认计划后再执行 git 命令。\n\n注意事项：\n- 遵循 Conventional Commits 规范\n- commit message 使用中文描述\n- 按功能模块合理分组\n- 避免混合不相关的改动\n\n{context}",
     "usage_count": 9,
     "last_used": "2025-06-03T01:31:17.766532",
     "tags": [

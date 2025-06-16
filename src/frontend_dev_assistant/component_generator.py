@@ -1351,4 +1351,46 @@ const emit = defineEmits<{
             "custom": "自定义组件"
         }
         
-        return descriptions.get(component_type, "通用组件") 
+        return descriptions.get(component_type, "通用组件")
+    
+    def generate_concise_commit_message(self, files: List[str], description: str) -> str:
+        """生成简洁的commit信息"""
+        # 分析文件类型来确定commit类型
+        commit_type = self._determine_commit_type(files)
+        
+        # 简化描述，确保不超过50字符
+        concise_desc = self._simplify_description(description)
+        
+        return f"{commit_type}: {concise_desc}"
+    
+    def _determine_commit_type(self, files: List[str]) -> str:
+        """根据文件变化确定commit类型"""
+        file_str = " ".join(files)
+        
+        if any(pattern in file_str for pattern in ['.md', 'README', 'docs/']):
+            return 'docs'
+        elif any(pattern in file_str for pattern in ['.gitignore', 'config', 'requirements.txt']):
+            return 'config'
+        elif any(pattern in file_str for pattern in ['test_', 'tests/', '_test.py']):
+            return 'test'
+        elif any(pattern in file_str for pattern in ['fix', 'bug', 'error']):
+            return 'fix'
+        elif any(pattern in file_str for pattern in ['refactor', 'optimize', 'improve']):
+            return 'refactor'
+        else:
+            return 'feat'
+    
+    def _simplify_description(self, description: str) -> str:
+        """简化描述，确保简洁明了"""
+        # 移除详细信息，保留核心描述
+        if '- ' in description:
+            # 如果包含列表，只取第一部分
+            main_desc = description.split('- ')[0].strip()
+        else:
+            main_desc = description
+        
+        # 限制长度
+        if len(main_desc) > 30:
+            main_desc = main_desc[:27] + "..."
+        
+        return main_desc 
