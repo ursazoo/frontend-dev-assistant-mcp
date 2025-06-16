@@ -49,19 +49,19 @@
       }
     },
     "2025-06-16": {
-      "total_calls": 13,
+      "total_calls": 16,
       "tool_breakdown": {
-        "get_prompt_template": 6,
-        "track_usage": 4,
-        "find_reusable_components": 2
+        "get_prompt_template": 7,
+        "track_usage": 5,
+        "find_reusable_components": 3
       }
     }
   },
   "tool_usage": {
     "get_prompt_template": {
-      "total_uses": 11,
+      "total_uses": 12,
       "first_used": "2025-06-02T22:47:45.242844",
-      "last_used": "2025-06-16T09:18:46.757157",
+      "last_used": "2025-06-16T09:25:59.559757",
       "feedback_scores": [
         5,
         5,
@@ -92,21 +92,23 @@
       "contexts": []
     },
     "track_usage": {
-      "total_uses": 12,
+      "total_uses": 13,
       "first_used": "2025-06-04T11:32:35.858264",
-      "last_used": "2025-06-16T09:10:45.239332",
+      "last_used": "2025-06-16T09:20:21.517237",
       "feedback_scores": [],
       "contexts": []
     },
     "find_reusable_components": {
-      "total_uses": 2,
+      "total_uses": 3,
       "first_used": "2025-06-16T09:09:58.755889",
-      "last_used": "2025-06-16T09:15:47.230564",
+      "last_used": "2025-06-16T09:20:56.355280",
       "feedback_scores": [
-        4
+        4,
+        5
       ],
       "contexts": [
-        "用户查找项目中可复用的modal组件"
+        "用户查找项目中可复用的modal组件",
+        "改进组件查找功能，解决了无法找到fbDialog等组件的问题，现在能准确识别78个modal组件"
       ]
     }
   },
@@ -327,6 +329,15 @@
       "timestamp": "2025-06-16T09:10:45.237145",
       "user_id": "rabbitsbear",
       "enhanced_usage_id": "66a896d7-a482-454c-96a6-dc822ac63dd5"
+    },
+    {
+      "id": "b0dc7a5e-c7e2-4d04-a5d2-b611fa507ca6",
+      "tool_name": "find_reusable_components",
+      "feedback": "excellent",
+      "context": "改进组件查找功能，解决了无法找到fbDialog等组件的问题，现在能准确识别78个modal组件",
+      "timestamp": "2025-06-16T09:20:21.515210",
+      "user_id": "rabbitsbear",
+      "enhanced_usage_id": "d5702c67-073b-4a4b-b642-d2f12ebf1322"
     }
   ],
   "usage_logs": [
@@ -745,6 +756,46 @@
         "context": "改进了MCP frontend-dev-assistant的find_reusable_components功能，解决了组件查找不准确的问题"
       },
       "user_id": "rabbitsbear"
+    },
+    {
+      "id": "b259a0da-428a-409e-84bf-0d12cf120e90",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T09:20:21.517237",
+      "date": "2025-06-16",
+      "arguments": {
+        "tool_name": "find_reusable_components",
+        "usage_context": "改进组件查找功能，解决了无法找到fbDialog等组件的问题，现在能准确识别78个modal组件",
+        "user_feedback": "excellent"
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "5772c580-96f5-4580-bde2-9da5085a4d35",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:20:56.355280",
+      "date": "2025-06-16",
+      "arguments": {
+        "project_path": "/Users/rabbitsbear/project/fshows/fs-codeOrder-web-project",
+        "component_type": "radio",
+        "search_keywords": [
+          "radio",
+          "Radio",
+          "单选",
+          "radioGroup"
+        ]
+      },
+      "user_id": "rabbitsbear"
+    },
+    {
+      "id": "7b2c11e9-fd54-4350-88b2-055f813f5309",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T09:25:59.559757",
+      "date": "2025-06-16",
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "清理了临时测试文件，准备提交代码"
+      },
+      "user_id": "rabbitsbear"
     }
   ],
   "enhanced_usage_logs": [
@@ -1155,6 +1206,30 @@
         "productivity_score": 0.0,
         "efficiency_rating": "未知"
       }
+    },
+    {
+      "id": "d5702c67-073b-4a4b-b642-d2f12ebf1322",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:20:21.515210",
+      "date": "2025-06-16",
+      "user_id": "rabbitsbear",
+      "context": "改进组件查找功能，解决了无法找到fbDialog等组件的问题，现在能准确识别78个modal组件",
+      "user_feedback": "excellent",
+      "ai_metrics": {
+        "session_duration": 0,
+        "files_modified": 0,
+        "lines_generated": 0,
+        "lines_deleted": 0,
+        "complexity_added": 0,
+        "ai_probability": 0,
+        "quality_score": 0,
+        "has_comments": false,
+        "has_error_handling": false,
+        "has_type_annotations": false,
+        "function_count": 0,
+        "productivity_score": 0.0,
+        "efficiency_rating": "未知"
+      }
     }
   ],
   "daily_ai_stats": {
@@ -1197,12 +1272,12 @@
       }
     },
     "2025-06-16": {
-      "total_sessions": 8,
+      "total_sessions": 9,
       "total_lines_generated": 275,
       "total_files_modified": 10,
-      "avg_ai_probability": 0.312,
-      "avg_quality_score": 39.375,
-      "avg_productivity": 0.384,
+      "avg_ai_probability": 0.277,
+      "avg_quality_score": 35.0,
+      "avg_productivity": 0.341,
       "tool_breakdown": {
         "get_prompt_template": 1,
         "git_commit_assistant": 1,
@@ -1211,7 +1286,7 @@
         "miniprogram_page_gen": 1,
         "typescript_types_gen": 1,
         "code_refactoring": 1,
-        "find_reusable_components": 1
+        "find_reusable_components": 2
       }
     }
   }

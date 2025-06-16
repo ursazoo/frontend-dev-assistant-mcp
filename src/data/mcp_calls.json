@@ -297,6 +297,61 @@
       "error_message": null,
       "result_size_bytes": 818,
       "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750036821518_track_usage",
+      "tool_name": "track_usage",
+      "timestamp": "2025-06-16T09:20:21.518644",
+      "date": "2025-06-16",
+      "hour": 9,
+      "arguments": {
+        "tool_name": "find_reusable_components",
+        "usage_context": "改进组件查找功能，解决了无法找到fbDialog等组件的问题，现在能准确识别78个modal组件",
+        "user_feedback": "excellent"
+      },
+      "execution_time_ms": 4.82,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 71,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750036856357_find_reusable_components",
+      "tool_name": "find_reusable_components",
+      "timestamp": "2025-06-16T09:20:56.357095",
+      "date": "2025-06-16",
+      "hour": 9,
+      "arguments": {
+        "project_path": "/Users/rabbitsbear/project/fshows/fs-codeOrder-web-project",
+        "component_type": "radio",
+        "search_keywords": [
+          "radio",
+          "Radio",
+          "单选",
+          "radioGroup"
+        ]
+      },
+      "execution_time_ms": 87.57,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 29,
+      "user_agent": "cursor-mcp"
+    },
+    {
+      "id": "1750037159561_get_prompt_template",
+      "tool_name": "get_prompt_template",
+      "timestamp": "2025-06-16T09:25:59.561744",
+      "date": "2025-06-16",
+      "hour": 9,
+      "arguments": {
+        "prompt_type": "git_commit",
+        "context": "清理了临时测试文件，准备提交代码"
+      },
+      "execution_time_ms": 5.67,
+      "success": true,
+      "error_message": null,
+      "result_size_bytes": 756,
+      "user_agent": "cursor-mcp"
     }
   ],
   "daily_stats": {
@@ -408,15 +463,15 @@
       }
     },
     "2025-06-16": {
-      "total_calls": 13,
-      "successful_calls": 13,
+      "total_calls": 16,
+      "successful_calls": 16,
       "failed_calls": 0,
-      "total_execution_time_ms": 160.57,
-      "avg_execution_time_ms": 12.35153846153846,
+      "total_execution_time_ms": 258.63,
+      "avg_execution_time_ms": 16.164375,
       "tool_breakdown": {
-        "get_prompt_template": 6,
-        "track_usage": 4,
-        "find_reusable_components": 2
+        "get_prompt_template": 7,
+        "track_usage": 5,
+        "find_reusable_components": 3
       },
       "hourly_distribution": {
         "0": 0,
@@ -428,7 +483,7 @@
         "6": 0,
         "7": 0,
         "8": 2,
-        "9": 4,
+        "9": 7,
         "10": 0,
         "11": 0,
         "12": 0,
@@ -448,13 +503,13 @@
   },
   "tool_stats": {
     "track_usage": {
-      "total_calls": 8,
-      "successful_calls": 8,
+      "total_calls": 9,
+      "successful_calls": 9,
       "failed_calls": 0,
       "first_used": "2025-06-14T15:54:14.555876",
-      "last_used": "2025-06-16T09:10:45.240959",
-      "avg_execution_time_ms": 49.67,
-      "total_execution_time_ms": 397.36,
+      "last_used": "2025-06-16T09:20:21.518644",
+      "avg_execution_time_ms": 44.68666666666667,
+      "total_execution_time_ms": 402.18,
       "common_arguments": {
         "tool_name": {
           "登录页面迁移": 1,
@@ -471,7 +526,7 @@
           "用户获取组件复用提示词模板": 1
         },
         "user_feedback": {
-          "excellent": 5,
+          "excellent": 6,
           "poor": 1,
           "good": 2
         }
@@ -479,16 +534,16 @@
       "error_patterns": []
     },
     "get_prompt_template": {
-      "total_calls": 7,
-      "successful_calls": 7,
+      "total_calls": 8,
+      "successful_calls": 8,
       "failed_calls": 0,
       "first_used": "2025-06-14T23:48:35.488048",
-      "last_used": "2025-06-16T09:18:46.758770",
-      "avg_execution_time_ms": 7.887142857142857,
-      "total_execution_time_ms": 55.21,
+      "last_used": "2025-06-16T09:25:59.561744",
+      "avg_execution_time_ms": 7.61,
+      "total_execution_time_ms": 60.88,
       "common_arguments": {
         "prompt_type": {
-          "git_commit": 6,
+          "git_commit": 7,
           "component_reuse": 1
         },
         "context": {
@@ -502,23 +557,25 @@
       "error_patterns": []
     },
     "find_reusable_components": {
-      "total_calls": 2,
-      "successful_calls": 2,
+      "total_calls": 3,
+      "successful_calls": 3,
       "failed_calls": 0,
       "first_used": "2025-06-16T09:09:58.757878",
-      "last_used": "2025-06-16T09:15:47.232852",
-      "avg_execution_time_ms": 46.964999999999996,
-      "total_execution_time_ms": 93.92999999999999,
+      "last_used": "2025-06-16T09:20:56.357095",
+      "avg_execution_time_ms": 60.5,
+      "total_execution_time_ms": 181.5,
       "common_arguments": {
         "project_path": {
-          "/Users/rabbitsbear/project/fshows/fs-codeOrder-web": 1,
+          "/Users/rabbitsbear/project/fshows/fs-codeOrder-web": 2,
           "/Users/rabbitsbear/project/fshows/fs-codeOrg": 1
         },
         "component_type": {
-          "modal": 2
+          "modal": 2,
+          "radio": 1
         },
         "search_keywords": {
-          "['modal', 'dialog', 'popup', '弹窗', '对话框']": 2
+          "['modal', 'dialog', 'popup', '弹窗', '对话框']": 2,
+          "['radio', 'Radio', '单选', 'radioGroup']": 1
         }
       },
       "error_patterns": []
