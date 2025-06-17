@@ -154,6 +154,104 @@ import {component_name} from '@/components/{component_name}.vue'
 💡 **提示**：请根据实际业务需求调整组件props和样式
 """
 
+    async def _generate_vue2_component(
+        self, 
+        component_type: str, 
+        component_name: str, 
+        props: List[Dict],
+        features: List[str]
+    ) -> str:
+        """生成Vue2组件"""
+        
+        # 组件模板映射
+        component_templates = {
+            "form": self._get_form_template(),
+            "table": self._get_table_template(),
+            "modal": self._get_modal_template(),
+            "card": self._get_card_template(),
+            "list": self._get_list_template()
+        }
+        
+        # 为ThirdPartyAuth组件使用专门的模板
+        if component_name == "ThirdPartyAuth":
+            base_template = self._get_third_party_auth_template()
+        else:
+            base_template = component_templates.get(component_type, self._get_custom_template())
+        
+        # 生成Vue2的props定义
+        props_code = self._generate_vue2_props_code(props)
+        
+        # 生成Vue2的组件逻辑
+        component_logic = self._generate_vue2_component_logic(component_type, features)
+        
+        # 组装完整组件
+        component_code = f"""<template>
+{base_template}
+</template>
+
+<script>
+/**
+ * {component_name} - {self._get_component_description(component_type)}
+ * @author 前端开发团队
+ * @created {datetime.now().strftime('%Y-%m-%d')}
+ */
+
+export default {{
+  name: '{component_name}',
+  
+{props_code}
+  
+{component_logic}
+}}
+</script>
+
+<style lang="scss" scoped>
+{self._generate_component_styles(component_type)}
+</style>"""
+
+        return f"""
+## 🎨 生成的Vue2组件代码
+
+### 组件文件：`{component_name}.vue`
+
+```vue
+{component_code}
+```
+
+### 使用示例：
+
+```vue
+<template>
+  <{self._to_kebab_case(component_name)} 
+    {self._generate_usage_example(props)}
+  />
+</template>
+
+<script>
+import {component_name} from '@/components/{component_name}.vue'
+
+export default {{
+  components: {{
+    {component_name}
+  }}
+}}
+</script>
+```
+
+### 组件特性：
+{self._format_features_list(features)}
+
+### 注意事项：
+- ✅ 遵循团队编码规范
+- ✅ 支持Vue2选项式API
+- ✅ 包含响应式设计
+- ✅ 添加无障碍支持
+- ✅ 完整的JSDoc注释
+
+---
+💡 **提示**：请根据实际业务需求调整组件props和样式
+"""
+
     def _get_form_template(self) -> str:
         """获取表单组件模板"""
         return '''  <div class="custom-form">
@@ -496,12 +594,83 @@ import {component_name} from '@/components/{component_name}.vue'
     def _get_custom_template(self) -> str:
         """获取自定义组件模板"""
         return '''  <div class="custom-component">
+    <!-- 自定义组件内容 -->
     <div class="component-header" v-if="title">
       <h3>{{ title }}</h3>
     </div>
     
-    <div class="component-content">
-      <slot></slot>
+    <div class="component-body">
+      <slot>
+        <!-- 默认内容 -->
+        <p>这是一个自定义组件</p>
+      </slot>
+    </div>
+  </div>'''
+
+    def _get_third_party_auth_template(self) -> str:
+        """获取第三方授权组件模板"""
+        return '''  <div class="third-party-auth" :class="['auth-type--' + authType, authStatusClass]">
+    <!-- 授权状态展示 -->
+    <div class="auth-status">
+      <div class="status-icon" :class="authStatusClass">
+        <i v-if="isAuthorized" class="icon-success">✓</i>
+        <i v-else-if="errorMessage" class="icon-error">✗</i>
+        <i v-else class="icon-pending">◎</i>
+      </div>
+      
+      <div class="status-info">
+        <h4 class="auth-title">{{ getAuthTitle() }}</h4>
+        <p class="auth-desc" v-if="!isAuthorized">{{ getAuthDescription() }}</p>
+        <p class="auth-success" v-if="isAuthorized">授权成功，可以正常使用相关功能</p>
+        <p class="auth-error" v-if="errorMessage">{{ errorMessage }}</p>
+      </div>
+    </div>
+    
+    <!-- 进度指示 -->
+    <div v-if="loading" class="auth-progress">
+      <div class="progress-bar">
+        <div class="progress-fill" :style="{ width: authProgress + '%' }"></div>
+      </div>
+      <p class="progress-text">授权进度: {{ authProgress }}%</p>
+    </div>
+    
+    <!-- 授权按钮 -->
+    <div class="auth-actions">
+      <button 
+        class="auth-btn"
+        :class="{ 
+          'auth-btn--loading': loading,
+          'auth-btn--success': isAuthorized,
+          'auth-btn--error': errorMessage
+        }"
+        :disabled="loading"
+        @click="handleAuth"
+        v-if="!isAuthorized"
+      >
+        <span v-if="loading" class="loading-spinner"></span>
+        {{ authButtonText }}
+      </button>
+      
+      <button 
+        v-if="errorMessage && !loading"
+        class="retry-btn"
+        @click="retry"
+      >
+        重试
+      </button>
+      
+      <div v-if="isAuthorized" class="auth-success-info">
+        <span class="success-text">{{ authButtonText }}</span>
+        <button class="reauth-btn" @click="reauthorize">重新授权</button>
+      </div>
+    </div>
+    
+    <!-- 帮助信息 -->
+    <div class="auth-help" v-if="!isAuthorized && !loading">
+      <p class="help-text">
+        <i class="help-icon">?</i>
+        点击授权按钮将跳转到{{ getAuthProviderName() }}完成授权
+      </p>
     </div>
   </div>'''
 
@@ -729,25 +898,80 @@ const emit = defineEmits<{
 
     def _generate_component_styles(self, component_type: str) -> str:
         """生成组件样式"""
-        base_styles = '''// 组件基础样式
-.custom-component {
-  // 基础样式
-}'''
+        
+        base_styles = """.component {
+  padding: 16px;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #1890ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  &.btn--primary {
+    background: #1890ff;
+    color: white;
+  }
+  
+  &.btn--secondary {
+    background: #f5f5f5;
+    color: #666;
+  }
+}"""
 
         if component_type == "form":
             return '''.custom-form {
   .form-container {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .form-header {
+    margin-bottom: 24px;
+    
+    .form-title {
+      font-size: 18px;
+      font-weight: 500;
+      color: #333;
+      margin: 0;
+    }
   }
 
   .form-item {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-
-    &--error {
+    margin-bottom: 16px;
+    
+    &.form-item--error {
       .form-input,
       .form-select,
       .form-textarea {
@@ -757,9 +981,11 @@ const emit = defineEmits<{
   }
 
   .form-label {
+    display: block;
+    margin-bottom: 8px;
     font-weight: 500;
     color: #333;
-
+    
     .required {
       color: #ff4d4f;
       margin-left: 4px;
@@ -769,16 +995,19 @@ const emit = defineEmits<{
   .form-input,
   .form-select,
   .form-textarea {
+    width: 100%;
     padding: 8px 12px;
     border: 1px solid #d9d9d9;
     border-radius: 4px;
+    font-size: 14px;
     transition: border-color 0.3s;
-
+    
     &:focus {
-      border-color: #1890ff;
       outline: none;
+      border-color: #1890ff;
+      box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
     }
-
+    
     &:disabled {
       background-color: #f5f5f5;
       cursor: not-allowed;
@@ -788,6 +1017,7 @@ const emit = defineEmits<{
   .field-error {
     color: #ff4d4f;
     font-size: 12px;
+    margin-top: 4px;
   }
 
   .form-footer {
@@ -795,6 +1025,8 @@ const emit = defineEmits<{
     justify-content: flex-end;
     gap: 12px;
     margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
   }
 }'''
 
@@ -2187,3 +2419,425 @@ const emit = defineEmits<{
             output.append(formatted_info)
         
         return '\n'.join(output)
+
+    def _generate_vue2_props_code(self, props: List[Dict]) -> str:
+        """生成Vue2的props代码"""
+        if not props:
+            return """props: {
+    title: {
+      type: String,
+      default: ''
+    }
+  },"""
+        
+        prop_definitions = []
+        for prop in props:
+            prop_name = prop.get('name', '')
+            prop_type = prop.get('type', 'String')
+            is_required = prop.get('required', False)
+            default_value = prop.get('default', '')
+            
+            # Vue2 类型映射
+            vue2_type_map = {
+                'string': 'String',
+                'number': 'Number',
+                'boolean': 'Boolean',
+                'array': 'Array',
+                'object': 'Object',
+                'function': 'Function'
+            }
+            
+            vue2_type = vue2_type_map.get(prop_type.lower(), 'String')
+            
+            prop_def = f"    {prop_name}: {{\n      type: {vue2_type}"
+            
+            if is_required:
+                prop_def += ",\n      required: true"
+            
+            if not is_required and default_value:
+                if vue2_type == 'String':
+                    prop_def += f",\n      default: '{default_value}'"
+                elif vue2_type in ['Array', 'Object']:
+                    prop_def += f",\n      default: () => {default_value}"
+                else:
+                    prop_def += f",\n      default: {default_value}"
+            elif not is_required:
+                if vue2_type == 'String':
+                    prop_def += ",\n      default: ''"
+                elif vue2_type == 'Number':
+                    prop_def += ",\n      default: 0"
+                elif vue2_type == 'Boolean':
+                    prop_def += ",\n      default: false"
+                elif vue2_type == 'Array':
+                    prop_def += ",\n      default: () => []"
+                elif vue2_type == 'Object':
+                    prop_def += ",\n      default: () => ({})"
+            
+            prop_def += "\n    }"
+            prop_definitions.append(prop_def)
+        
+        return f"""props: {{
+{',\n'.join(prop_definitions)}
+  }},"""
+
+    def _generate_vue2_component_logic(self, component_type: str, features: List[str]) -> str:
+        """生成Vue2组件逻辑代码"""
+        
+        if component_type == "form":
+            return """data() {
+    return {
+      formData: {},
+      errors: {},
+      loading: false
+    }
+  },
+  
+  computed: {
+    isFormValid() {
+      return Object.keys(this.errors).length === 0
+    }
+  },
+  
+  methods: {
+    validateField(fieldName) {
+      // 字段验证逻辑
+      // this.$set(this.errors, fieldName, errorMessage)
+    },
+    
+    handleSubmit() {
+      if (this.isFormValid) {
+        this.loading = true
+        this.$emit('submit', this.formData)
+      }
+    },
+    
+    handleCancel() {
+      this.$emit('cancel')
+    },
+    
+    getFieldError(fieldName) {
+      return this.errors[fieldName]
+    }
+  },
+  
+  mounted() {
+    // 组件挂载后的逻辑
+  }"""
+
+        elif component_type == "table":
+            return """data() {
+    return {
+      loading: false,
+      sortConfig: {
+        key: '',
+        direction: 'asc'
+      }
+    }
+  },
+  
+  computed: {
+    paginatedData() {
+      if (!this.data || !this.pagination) return []
+      const start = (this.pagination.current - 1) * this.pagination.pageSize
+      const end = start + this.pagination.pageSize
+      return this.data.slice(start, end)
+    },
+    
+    totalPages() {
+      if (!this.pagination) return 0
+      return Math.ceil(this.pagination.total / this.pagination.pageSize)
+    }
+  },
+  
+  methods: {
+    handleRefresh() {
+      this.$emit('refresh')
+    },
+    
+    handleSort(key) {
+      this.sortConfig.key = key
+      this.sortConfig.direction = this.sortConfig.direction === 'asc' ? 'desc' : 'asc'
+      this.$emit('sort', { key, direction: this.sortConfig.direction })
+    },
+    
+    handleRowClick(row, index) {
+      this.$emit('row-click', { row, index })
+    },
+    
+    getRowKey(row, index) {
+      return row.id || index
+    },
+    
+    getColumnValue(row, key) {
+      return row[key]
+    },
+    
+    getSortClass(key) {
+      if (this.sortConfig.key === key) {
+        return `sort-${this.sortConfig.direction}`
+      }
+      return ''
+    },
+    
+    isRowSelected(row) {
+      return false
+    },
+    
+    goToPage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.$emit('page-change', page)
+      }
+    }
+  }"""
+
+        elif component_type == "modal":
+            return """data() {
+    return {
+      loading: false
+    }
+  },
+  
+  computed: {
+    sizeClass() {
+      return `modal--${this.size || 'medium'}`
+    }
+  },
+  
+  methods: {
+    handleClose() {
+      this.$emit('update:visible', false)
+      this.$emit('close')
+    },
+    
+    handleCancel() {
+      this.$emit('cancel')
+      this.handleClose()
+    },
+    
+    handleConfirm() {
+      this.$emit('confirm')
+    },
+    
+    handleOverlayClick() {
+      if (this.maskClosable) {
+        this.handleClose()
+      }
+    }
+  },
+  
+  watch: {
+    visible(newVal) {
+      if (newVal) {
+        this.$nextTick(() => {
+          // 获取焦点等操作
+        })
+      }
+    }
+  }"""
+
+        elif component_type == "custom":
+            return """data() {
+    return {
+      loading: false,
+      isAuthorized: false,
+      authProgress: 0,
+      errorMessage: ''
+    }
+  },
+  
+  computed: {
+    authButtonText() {
+      if (this.loading) return '授权中...'
+      if (this.isAuthorized) return '已授权'
+      return '立即授权'
+    },
+    
+    authStatusClass() {
+      if (this.isAuthorized) return 'status--success'
+      if (this.errorMessage) return 'status--error'
+      return 'status--pending'
+    }
+  },
+  
+  methods: {
+    getAuthTitle() {
+      const titles = {
+        wechat: '微信授权',
+        alipay: '支付宝授权', 
+        qq: 'QQ授权',
+        weibo: '微博授权'
+      }
+      return titles[this.authType] || '第三方授权'
+    },
+    
+    getAuthDescription() {
+      const descriptions = {
+        wechat: '需要获取您的微信基本信息以提供个性化服务',
+        alipay: '需要获取您的支付宝基本信息以提供相关服务',
+        qq: '需要获取您的QQ基本信息以提供个性化服务',
+        weibo: '需要获取您的微博基本信息以提供相关功能'
+      }
+      return descriptions[this.authType] || '需要您的授权以提供更好的服务'
+    },
+    
+    getAuthProviderName() {
+      const names = {
+        wechat: '微信',
+        alipay: '支付宝',
+        qq: 'QQ',
+        weibo: '微博'
+      }
+      return names[this.authType] || '第三方平台'
+    },
+    
+    handleAuth() {
+      if (this.loading || this.isAuthorized) return
+      
+      this.loading = true
+      this.errorMessage = ''
+      this.authProgress = 0
+      
+      // 模拟授权流程
+      this.simulateAuthProgress()
+      
+      // 实际授权逻辑
+      this.performAuth()
+    },
+    
+    simulateAuthProgress() {
+      const interval = setInterval(() => {
+        this.authProgress += 10
+        if (this.authProgress >= 100) {
+          clearInterval(interval)
+        }
+      }, 200)
+    },
+    
+    async performAuth() {
+      try {
+        // 这里应该调用实际的授权API
+        const authUrl = this.buildAuthUrl()
+        
+        if (this.redirectUrl) {
+          window.location.href = authUrl
+        } else {
+          // 弹窗授权
+          this.openAuthWindow(authUrl)
+        }
+        
+      } catch (error) {
+        this.handleAuthError(error)
+      }
+    },
+    
+    buildAuthUrl() {
+      const baseUrl = this.getAuthBaseUrl()
+      const params = new URLSearchParams({
+        client_id: this.getClientId(),
+        redirect_uri: this.redirectUrl || window.location.origin,
+        response_type: 'code',
+        scope: this.getAuthScope()
+      })
+      
+      return `${baseUrl}?${params.toString()}`
+    },
+    
+    getAuthBaseUrl() {
+      const authUrls = {
+        wechat: 'https://open.weixin.qq.com/connect/oauth2/authorize',
+        alipay: 'https://openauth.alipay.com/oauth2/publicAppAuthorize.htm',
+        qq: 'https://graph.qq.com/oauth2.0/authorize'
+      }
+      return authUrls[this.authType] || authUrls.wechat
+    },
+    
+    getClientId() {
+      // 从配置或环境变量获取
+      return process.env.VUE_APP_CLIENT_ID || 'your_client_id'
+    },
+    
+    getAuthScope() {
+      const scopes = {
+        wechat: 'snsapi_userinfo',
+        alipay: 'auth_user',
+        qq: 'get_user_info'
+      }
+      return scopes[this.authType] || scopes.wechat
+    },
+    
+    openAuthWindow(authUrl) {
+      const authWindow = window.open(
+        authUrl, 
+        'auth_window',
+        'width=500,height=600,scrollbars=yes,resizable=yes'
+      )
+      
+      // 监听授权窗口
+      const checkClosed = setInterval(() => {
+        if (authWindow.closed) {
+          clearInterval(checkClosed)
+          this.handleAuthComplete()
+        }
+      }, 1000)
+    },
+    
+    handleAuthComplete() {
+      this.loading = false
+      this.authProgress = 100
+      this.isAuthorized = true
+      this.$emit('auth-success', { authType: this.authType })
+    },
+    
+    handleAuthError(error) {
+      this.loading = false
+      this.authProgress = 0
+      this.errorMessage = error.message || '授权失败，请重试'
+      this.$emit('auth-error', { error, authType: this.authType })
+    },
+    
+    retry() {
+      this.errorMessage = ''
+      this.handleAuth()
+    },
+    
+    reauthorize() {
+      // 清除授权状态
+      this.isAuthorized = false
+      this.authProgress = 0
+      localStorage.removeItem(`${this.authType}_token`)
+      this.handleAuth()
+    },
+    
+    checkAuthStatus() {
+      // 检查本地存储或调用API检查授权状态
+      const token = localStorage.getItem(`${this.authType}_token`)
+      if (token) {
+        this.isAuthorized = true
+        this.authProgress = 100
+      }
+    }
+  },
+  
+  mounted() {
+    // 检查是否已经授权
+    this.checkAuthStatus()
+  }"""
+
+        else:
+            return """data() {
+    return {
+      loading: false
+    }
+  },
+  
+  computed: {
+    // 计算属性
+  },
+  
+  methods: {
+    // 组件方法
+  },
+  
+  mounted() {
+    // 组件挂载后的逻辑
+  }"""

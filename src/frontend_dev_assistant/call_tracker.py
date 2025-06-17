@@ -7,6 +7,9 @@ MCP调用追踪中间件
 import json
 import time
 import asyncio
+import os
+import logging
+import sys
 from pathlib import Path
 from datetime import datetime
 from typing import Dict, Any, Optional, List
@@ -26,8 +29,6 @@ class MCPCallTracker:
     
     def _determine_data_directory(self) -> Path:
         """确定数据保存目录"""
-        import os
-        
         # 1. 环境变量
         env_data_dir = os.environ.get('FRONTEND_DEV_ASSISTANT_DATA_DIR')
         if env_data_dir:
@@ -314,6 +315,98 @@ class MCPCallTracker:
             
         except Exception as e:
             return {"error": f"获取统计数据失败: {e}"}
+    
+    def detailed_context_test(self, tool_name: str, params: Dict[str, Any], **kwargs) -> Dict[str, Any]:
+        """
+        详细测试：记录MCP调用时能获取到的所有信息
+        用于分析MCP工具的上下文获取能力
+        """
+        timestamp = datetime.now().isoformat()
+        
+        # 收集所有可能的上下文信息
+        context_data = {
+            "timestamp": timestamp,
+            "tool_name": tool_name,
+            "received_params": params,
+            "additional_kwargs": kwargs,
+            
+            # 环境信息
+            "environment": {
+                "cwd": os.getcwd(),
+                "user": os.getenv("USER") or os.getenv("USERNAME"),
+                "python_version": f"{sys.version_info.major}.{sys.version_info.minor}",
+                "platform": sys.platform,
+            },
+            
+            # 进程信息
+            "process_info": {
+                "pid": os.getpid(),
+                "parent_pid": os.getppid() if hasattr(os, 'getppid') else None,
+            },
+            
+            # 检查是否有任何隐藏的上下文
+            "hidden_context": {
+                "globals_keys": list(globals().keys()),
+                "locals_keys": list(locals().keys()) if 'locals' in dir() else [],
+                "env_vars": {k: v for k, v in os.environ.items() if 'CURSOR' in k or 'CLAUDE' in k or 'MCP' in k},
+            },
+            
+            # 检查调用栈
+            "call_stack_info": self._get_call_stack_info(),
+            
+            # 参数详细分析
+            "params_analysis": {
+                "param_count": len(params),
+                "param_types": {k: type(v).__name__ for k, v in params.items()},
+                "param_sizes": {k: len(str(v)) for k, v in params.items()},
+                "has_long_text": any(len(str(v)) > 100 for v in params.values()),
+            }
+        }
+        
+        # 保存到专门的测试文件
+        test_file = self.data_dir / "context_test_log.jsonl"
+        try:
+            with open(test_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(context_data, ensure_ascii=False) + "\n")
+        except Exception as e:
+            logging.error(f"保存上下文测试数据失败: {e}")
+        
+        # 同时打印到控制台（如果有的话）
+        print("="*50)
+        print("MCP上下文测试数据:")
+        print(json.dumps(context_data, indent=2, ensure_ascii=False))
+        print("="*50)
+        
+        return context_data
+    
+    def _get_call_stack_info(self) -> Dict[str, Any]:
+        """获取调用栈信息"""
+        import inspect
+        
+        stack_info = {
+            "stack_depth": 0,
+            "functions": [],
+            "files": []
+        }
+        
+        try:
+            stack = inspect.stack()
+            stack_info["stack_depth"] = len(stack)
+            
+            for frame_info in stack[:10]:  # 只取前10层
+                stack_info["functions"].append({
+                    "function": frame_info.function,
+                    "filename": os.path.basename(frame_info.filename),
+                    "lineno": frame_info.lineno,
+                })
+                
+                if frame_info.filename not in stack_info["files"]:
+                    stack_info["files"].append(os.path.basename(frame_info.filename))
+                    
+        except Exception as e:
+            stack_info["error"] = str(e)
+            
+        return stack_info
 
 # 创建全局追踪器实例
 call_tracker = MCPCallTracker()
