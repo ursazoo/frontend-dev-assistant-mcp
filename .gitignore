@@ -20,8 +20,25 @@ Thumbs.db
 install.log*
 
 # Data files and statistics (runtime generated)
-data/mcp_calls.json
-data/usage_stats.json
+# 忽略data目录下的数据文件，但保留README
+data/*
+!data/README.md
 
 # Frontend dev assistant usage statistics
 **/usage_stats.json
+**/mcp_calls.json
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs and cache
+*.log
+logs/
+.cache/
+
+# Environment and config
+.env
+.env.local
+*.env
