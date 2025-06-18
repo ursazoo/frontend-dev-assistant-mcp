@@ -17,7 +17,7 @@ from mcp.server.models import InitializationOptions
 import mcp.server.stdio
 import mcp.types as types
 from frontend_dev_assistant.prompt_manager import PromptManager
-from frontend_dev_assistant.component_generator import ComponentGenerator
+from frontend_dev_assistant.component_finder import ComponentFinder
 from frontend_dev_assistant.usage_tracker import UsageTracker
 from frontend_dev_assistant.call_tracker import call_tracker
 
@@ -29,7 +29,7 @@ class FrontendDevMCP:
     def __init__(self):
         self.server = Server("frontend-dev-assistant")
         self.prompt_manager = PromptManager()
-        self.component_generator = ComponentGenerator()
+        self.component_finder = ComponentFinder()
         self.usage_tracker = UsageTracker()
         self.setup_tools()
     
@@ -123,8 +123,8 @@ class FrontendDevMCP:
                         "properties": {
                             "prompt_type": {
                                 "type": "string",
-                                "enum": ["git_commit", "code_review", "component_reuse", "custom"],
-                                "description": "提示词类型：git_commit(代码提交), code_review(代码审查), component_reuse(组件复用), custom(自定义)"
+                                "enum": ["git_commit", "code_review", "component_reuse", "project_environment_troubleshooting", "custom"],
+                                "description": "提示词类型：git_commit(代码提交), code_review(代码审查), component_reuse(组件复用), project_environment_troubleshooting(项目环境排查), custom(自定义)"
                             },
                             "context": {
                                 "type": "string",
@@ -132,49 +132,6 @@ class FrontendDevMCP:
                             }
                         },
                         "required": ["prompt_type"]
-                    }
-                ),
-                
-                types.Tool(
-                    name="generate_vue_component",
-                    description="基于编码规范生成Vue组件",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "component_type": {
-                                "type": "string",
-                                "enum": ["form", "table", "modal", "card", "list", "custom"],
-                                "description": "组件类型"
-                            },
-                            "component_name": {
-                                "type": "string",
-                                "description": "组件名称（PascalCase）"
-                            },
-                            "vue_version": {
-                                "type": "string", 
-                                "enum": ["vue2", "vue3"],
-                                "description": "Vue版本"
-                            },
-                            "props": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "name": {"type": "string"},
-                                        "type": {"type": "string"},
-                                        "required": {"type": "boolean"},
-                                        "default": {"type": "string"}
-                                    }
-                                },
-                                "description": "组件props定义"
-                            },
-                            "features": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "description": "组件功能特性"
-                            }
-                        },
-                        "required": ["component_type", "component_name", "vue_version"]
                     }
                 ),
                 
@@ -267,6 +224,8 @@ class FrontendDevMCP:
                         "required": []
                     }
                 ),
+                
+
 
             ]
         
@@ -283,17 +242,8 @@ class FrontendDevMCP:
                         arguments.get("context", "")
                     )
                     
-                elif name == "generate_vue_component":
-                    result = await self.component_generator.generate_component(
-                        component_type=arguments.get("component_type"),
-                        component_name=arguments.get("component_name"),
-                        vue_version=arguments.get("vue_version"),
-                        props=arguments.get("props", []),
-                        features=arguments.get("features", [])
-                    )
-                    
                 elif name == "find_reusable_components":
-                    result = await self.component_generator.find_reusable_components(
+                    result = await self.component_finder.find_reusable_components(
                         project_path=arguments.get("project_path"),
                         component_type=arguments.get("component_type"),
                         search_keywords=arguments.get("search_keywords", [])
@@ -320,7 +270,7 @@ class FrontendDevMCP:
                     )
                     
                 else:
-                    result = f"未知工具: {name}"
+                    result = f"❌ 未知工具: {name}\n\n可用工具：get_prompt_template, find_reusable_components, track_usage, get_usage_stats"
                 
                 # 记录工具使用
                 await self.usage_tracker.log_tool_call(name, arguments)
@@ -329,7 +279,13 @@ class FrontendDevMCP:
                 
             except Exception as e:
                 logger.error(f"工具调用错误 {name}: {str(e)}")
-                return [types.TextContent(type="text", text=f"错误: {str(e)}")]
+                error_msg = f"""❌ **工具执行出错**
+
+**工具名称:** {name}
+**错误信息:** {str(e)}
+
+请检查参数是否正确，或联系技术支持。"""
+                return [types.TextContent(type="text", text=error_msg)]
 
 async def main():
     """启动MCP服务器"""

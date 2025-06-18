@@ -19,7 +19,7 @@ os.environ["PYTHONPATH"] = str(src_dir)
 # 导入并运行MCP服务器
 if __name__ == "__main__":
     try:
-        from frontend_dev_assistant.server import main
+        from server import main
         import asyncio
         
         print("🚀 启动 Frontend Dev Assistant MCP 服务器...")
