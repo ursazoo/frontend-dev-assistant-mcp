@@ -1,9 +1,11 @@
 # Cursor MCP 连接指南
 
 ## 🎯 目标
+
 将本地的`frontend_dev_assistant` MCP服务器连接到Cursor，启用**自动调用追踪**功能。
 
 ## ✅ 前置条件检查
+
 - [x] MCP包已安装 (`pip3 install --user mcp`)
 - [x] 服务器初始化测试通过
 - [x] 调用追踪系统已集成
@@ -13,6 +15,7 @@
 ### 1. 找到Cursor的MCP配置文件
 
 **方法1: 通过Cursor设置**
+
 1. 打开Cursor
 2. 按 `Cmd+Shift+P` (macOS) 打开命令面板
 3. 输入 "mcp" 搜索MCP相关设置
@@ -20,14 +23,19 @@
 
 **方法2: 手动编辑配置文件**
 Cursor的MCP配置文件通常位于：
+
 ```
 ~/Library/Application Support/Cursor/User/globalStorage/rooveterinaryinc.cursor-small-mcp/mcp_settings.json
 ```
+
 或者
+
 ```
 ~/.cursor/mcp_settings.json
 ```
+
 或者
+
 ```
 ~/.config/cursor/mcp_settings.json
 ```
@@ -51,6 +59,7 @@ Cursor的MCP配置文件通常位于：
 ```
 
 **重要提示：**
+
 - 确保路径 `/Users/rabbitsbear/project/mine/python-mcp/run_mcp_server.py` 正确
 - 如果你的用户名不是 `rabbitsbear`，请修改为正确的路径
 
@@ -67,10 +76,13 @@ Cursor的MCP配置文件通常位于：
 ## 🧪 测试MCP功能
 
 ### 测试工具1: 获取提示词模板
+
 ```
 @frontend-dev-assistant get_prompt_template
 ```
+
 参数示例：
+
 ```json
 {
   "prompt_type": "git_commit",
@@ -79,10 +91,13 @@ Cursor的MCP配置文件通常位于：
 ```
 
 ### 测试工具2: 生成Vue组件
+
 ```
 @frontend-dev-assistant generate_vue_component
 ```
+
 参数示例：
+
 ```json
 {
   "component_type": "form",
@@ -92,10 +107,13 @@ Cursor的MCP配置文件通常位于：
 ```
 
 ### 测试工具3: 查找可复用组件
+
 ```
 @frontend-dev-assistant find_reusable_components
 ```
+
 参数示例：
+
 ```json
 {
   "project_path": "/path/to/your/frontend/project",
@@ -124,26 +142,34 @@ python mcp_stats.py --export csv
 ## 🔧 故障排除
 
 ### 问题1: Cursor中看不到MCP服务器
+
 **解决方案：**
+
 1. 检查配置文件路径是否正确
 2. 确保JSON格式正确（没有语法错误）
 3. 重启Cursor
 4. 查看Cursor的开发者工具控制台是否有错误信息
 
 ### 问题2: MCP工具调用失败
+
 **解决方案：**
+
 1. 检查 `run_mcp_server.py` 路径是否正确
 2. 确保有执行权限：`chmod +x run_mcp_server.py`
 3. 手动测试服务器：`python3 test_mcp_server.py`
 
 ### 问题3: 依赖包缺失
+
 **解决方案：**
+
 ```bash
 pip3 install --user mcp pydantic typing-extensions aiofiles
 ```
 
 ### 问题4: 权限问题
+
 **解决方案：**
+
 ```bash
 # 确保脚本有执行权限
 chmod +x /Users/rabbitsbear/project/mine/python-mcp/run_mcp_server.py
@@ -161,6 +187,7 @@ python mcp_stats.py
 ```
 
 你会看到类似这样的输出：
+
 ```
 🔍 Frontend Dev Assistant MCP 调用统计
 ============================================================
@@ -209,8 +236,9 @@ python mcp_stats.py
 ---
 
 **📞 如果遇到问题：**
+
 1. 先运行 `python3 test_mcp_server.py` 确认服务器正常
 2. 检查Cursor的开发者工具控制台错误信息
 3. 确认配置文件路径和格式正确
 
-祝使用愉快！🎉 
+祝使用愉快！🎉

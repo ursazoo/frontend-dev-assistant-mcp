@@ -226,7 +226,20 @@ class PromptManager:
         
         # 保存默认模板到文件
         templates_file = self.templates_dir / "default_templates.json"
-        if not templates_file.exists():
+        
+        # 检查现有文件是否包含所有默认模板
+        should_update = True
+        if templates_file.exists():
+            try:
+                with open(templates_file, 'r', encoding='utf-8') as f:
+                    existing_templates = json.load(f)
+                # 检查是否包含所有默认模板
+                if all(key in existing_templates for key in default_templates.keys()):
+                    should_update = False
+            except (json.JSONDecodeError, KeyError):
+                should_update = True
+        
+        if should_update:
             with open(templates_file, 'w', encoding='utf-8') as f:
                 json.dump(default_templates, f, ensure_ascii=False, indent=2)
     
@@ -330,8 +343,33 @@ class PromptManager:
         except Exception as e:
             return f"添加自定义模板时出错：{str(e)}"
     
-    async def list_templates(self) -> str:
-        """列出所有可用的提示词模板"""
+    async def list_templates(self) -> List[str]:
+        """列出所有可用的提示词模板名称"""
+        try:
+            template_names = []
+            
+            # 加载默认模板
+            templates_file = self.templates_dir / "default_templates.json"
+            if templates_file.exists():
+                with open(templates_file, 'r', encoding='utf-8') as f:
+                    templates = json.load(f)
+                template_names.extend(templates.keys())
+            
+            # 加载自定义模板
+            custom_file = self.templates_dir / "custom_templates.json"
+            if custom_file.exists():
+                with open(custom_file, 'r', encoding='utf-8') as f:
+                    custom_templates = json.load(f)
+                template_names.extend(custom_templates.keys())
+            
+            return template_names
+            
+        except Exception as e:
+            print(f"列出模板时出错：{str(e)}")
+            return []
+    
+    async def get_template_details(self) -> str:
+        """获取所有模板的详细信息（用于显示）"""
         try:
             result = "📚 **可用的提示词模板**\n\n"
             
@@ -368,4 +406,4 @@ class PromptManager:
             return result
             
         except Exception as e:
-            return f"列出模板时出错：{str(e)}" 
+            return f"获取模板详情时出错：{str(e)}" 
