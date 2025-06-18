@@ -1,184 +1,218 @@
 """
-MCP Analytics API服务器
-提供用户注册、使用日志记录和报告查询功能
+MCP Analytics API Server
+简化版数据收集API
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import asyncio
+from typing import Dict, Any, Optional
 from datetime import datetime
 
 from .models import UserRegister, UsageLog, ApiResponse
-from .database import db_manager
+from .mcp_data_service import MCPDataService
 
-# 创建FastAPI应用
 app = FastAPI(
     title="MCP Analytics API",
-    description="前端开发AI助手使用数据收集和分析API",
-    version="1.0.0"
+    description="MCP工具使用数据收集和分析API",
+    version="2.0.0"
 )
 
-# 添加CORS中间件
+# CORS设置
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 开发环境允许所有域名
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# 全局数据服务实例
+data_service: Optional[MCPDataService] = None
+
+async def get_data_service() -> MCPDataService:
+    """获取数据服务实例"""
+    global data_service
+    if data_service is None:
+        data_service = MCPDataService()
+        await data_service.init_service()
+    return data_service
+
 @app.on_event("startup")
 async def startup_event():
-    """应用启动时初始化数据库"""
+    """应用启动事件"""
+    print("🚀 MCP Analytics API 启动中...")
     try:
-        await db_manager.init_database()
-        print("🚀 MCP Analytics API 启动成功!")
-        print("📊 数据库连接正常")
+        await get_data_service()
+        print("✅ 数据服务初始化完成")
     except Exception as e:
-        print(f"❌ 启动失败: {e}")
-        raise
+        print(f"❌ 数据服务初始化失败: {e}")
 
-@app.get("/")
+@app.on_event("shutdown")
+async def shutdown_event():
+    """应用关闭事件"""
+    global data_service
+    if data_service:
+        await data_service.close()
+    print("📴 MCP Analytics API 已关闭")
+
+@app.get("/", response_model=ApiResponse)
 async def root():
-    """根路径 - API状态检查"""
-    return {
-        "message": "MCP Analytics API",
-        "version": "1.0.0",
-        "status": "running",
-        "timestamp": datetime.now().isoformat()
-    }
+    """API根路径"""
+    return ApiResponse(
+        status="success",
+        message="MCP Analytics API v2.0 - 数据收集服务",
+        data={
+            "version": "2.0.0",
+            "service": "mcp-analytics",
+            "status": "running",
+            "timestamp": datetime.now().isoformat()
+        }
+    )
 
 @app.get("/health")
 async def health_check():
-    """健康检查接口"""
-    try:
-        # 测试数据库连接
-        conn = await db_manager.get_connection()
-        await conn.fetchval("SELECT 1")
-        await conn.close()
-        
-        return {
-            "status": "healthy",
-            "database": "connected",
-            "timestamp": datetime.now().isoformat()
-        }
-    except Exception as e:
-        raise HTTPException(status_code=503, detail=f"数据库连接失败: {str(e)}")
+    """健康检查"""
+    service = await get_data_service()
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now().isoformat(),
+        "database": "connected"
+    }
 
-@app.post("/api/users/register")
-async def register_user(user: UserRegister):
-    """
-    用户注册/更新接口
-    
-    将UUID与企业邮箱绑定，支持更新用户信息
-    """
+# 用户管理接口
+@app.post("/api/users/register", response_model=ApiResponse)
+async def register_user(
+    user_data: UserRegister,
+    service: MCPDataService = Depends(get_data_service)
+):
+    """注册用户"""
     try:
-        result = await db_manager.register_user(
-            uuid=user.uuid,
-            email=user.email,
-            name=user.name,
-            department=user.department
+        result = await service.register_user(user_data.dict())
+        return ApiResponse(
+            status="success",
+            message="用户注册成功",
+            data=result
         )
-        
-        return {
-            "status": "success",
-            "message": f"用户{result['status']}成功",
-            "data": result
-        }
-        
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/usage/log")
-async def log_usage(usage: UsageLog):
-    """
-    记录使用日志接口
-    
-    记录用户对MCP工具的使用情况
-    """
+# MCP数据收集接口
+@app.post("/api/mcp/record", response_model=ApiResponse)
+async def record_mcp_call(
+    usage_data: UsageLog,
+    execution_time: Optional[float] = 0,
+    success: Optional[bool] = True,
+    error_message: Optional[str] = None,
+    service: MCPDataService = Depends(get_data_service)
+):
+    """记录MCP工具调用"""
     try:
-        result = await db_manager.log_usage(
-            user_uuid=usage.user_uuid,
-            tool_name=usage.tool_name,
-            arguments=usage.arguments
+        result = await service.record_mcp_call(
+            user_uuid=usage_data.user_uuid,
+            tool_name=usage_data.tool_name,
+            arguments=usage_data.arguments,
+            execution_time=execution_time,
+            success=success,
+            error_message=error_message
         )
         
-        return {
-            "status": "success",
-            "message": "使用记录已保存",
-            "data": result
-        }
-        
+        return ApiResponse(
+            status=result['status'],
+            message=result['message'],
+            data=result.get('data')
+        )
     except Exception as e:
-        if "用户不存在" in str(e):
-            raise HTTPException(status_code=404, detail="用户不存在，请先注册")
-        else:
-            raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/users/{user_uuid}/report")
-async def get_user_report(user_uuid: str, days: int = 30):
-    """
-    获取用户使用报告接口
-    
-    返回指定时间范围内的用户使用统计数据
-    """
+# 分析报告接口
+@app.get("/api/analytics/user/{user_uuid}", response_model=ApiResponse)
+async def get_user_analytics(
+    user_uuid: str,
+    days: int = 30,
+    service: MCPDataService = Depends(get_data_service)
+):
+    """获取用户分析报告"""
     try:
-        if days <= 0 or days > 365:
-            raise HTTPException(status_code=400, detail="天数范围应在1-365之间")
-        
-        report = await db_manager.get_user_report(user_uuid, days)
-        
-        return {
-            "status": "success",
-            "message": "报告生成成功",
-            "data": report
-        }
-        
+        analytics = await service.get_user_analytics(user_uuid, days)
+        return ApiResponse(
+            status="success",
+            message="用户分析数据获取成功",
+            data=analytics
+        )
     except Exception as e:
-        if "用户不存在" in str(e):
-            raise HTTPException(status_code=404, detail="用户不存在")
-        else:
-            raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
 
-@app.get("/api/stats/summary")
-async def get_summary_stats():
-    """
-    获取整体统计摘要（未来扩展用）
-    """
-    return {
-        "status": "success",
-        "message": "功能开发中",
-        "data": {
-            "total_users": 0,
-            "total_usage": 0,
-            "active_tools": 0
-        }
-    }
+@app.get("/api/analytics/team", response_model=ApiResponse)
+async def get_team_analytics(
+    department: Optional[str] = None,
+    days: int = 30,
+    service: MCPDataService = Depends(get_data_service)
+):
+    """获取团队分析报告"""
+    try:
+        analytics = await service.get_team_analytics(department, days)
+        return ApiResponse(
+            status="success",
+            message="团队分析数据获取成功",
+            data=analytics
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-# 错误处理器
-@app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
-    """全局异常处理器"""
-    return {
-        "status": "error",
-        "message": f"服务器内部错误: {str(exc)}",
-        "timestamp": datetime.now().isoformat()
-    }
+# Git分析接口
+@app.get("/api/git/status", response_model=ApiResponse)
+async def get_git_status(
+    service: MCPDataService = Depends(get_data_service)
+):
+    """获取当前git状态"""
+    try:
+        status = service.git_analyzer.get_status()
+        repo_info = service.git_analyzer.get_repo_info()
+        
+        return ApiResponse(
+            status="success",
+            message="Git状态获取成功",
+            data={
+                "repository": repo_info,
+                "status": status,
+                "timestamp": datetime.now().isoformat()
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-def start_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = False):
-    """启动服务器"""
-    print(f"🚀 启动 MCP Analytics API 服务器...")
-    print(f"📍 地址: http://{host}:{port}")
-    print(f"📚 API文档: http://{host}:{port}/docs")
-    
-    uvicorn.run(
-        "analytics_api.server:app",
-        host=host,
-        port=port,
-        reload=reload,
-        log_level="info"
-    )
+@app.get("/api/git/commits", response_model=ApiResponse)
+async def get_commit_history(
+    days: int = 7,
+    author: Optional[str] = None,
+    service: MCPDataService = Depends(get_data_service)
+):
+    """获取提交历史"""
+    try:
+        commits = service.git_analyzer.get_commit_history(days, author)
+        analysis = service.git_analyzer.analyze_commit_patterns(commits)
+        
+        return ApiResponse(
+            status="success",
+            message="提交历史获取成功",
+            data={
+                "commits": commits,
+                "analysis": analysis,
+                "period_days": days,
+                "timestamp": datetime.now().isoformat()
+            }
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    start_server(reload=True)
+    print("🔧 启动MCP Analytics API服务器...")
+    uvicorn.run(
+        "src.analytics_api.server:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        log_level="info"
+    )
