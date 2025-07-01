@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/ursazoo-frontend-dev-assistant-mcp-badge.png)](https://mseep.ai/app/ursazoo-frontend-dev-assistant-mcp)
+
 # 前端开发提示词智能助手 MCP
 
 ## 项目简介
